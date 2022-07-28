@@ -5,7 +5,6 @@ import { motion } from "framer-motion";
 function NavBar() {
 	const [username, setUsername] = useState("");
 	const [isOpen, setIsOpen] = useState(false);
-	const [autoScroll, setAutoScroll] = useState(true);
 	const dropdownRef = useRef();
 
 	const location = useLocation();
@@ -34,17 +33,6 @@ function NavBar() {
 		if (hide == undefined) return setIsOpen(!isOpen);
 		setIsOpen(hide);
 	};
-
-	const toggleAutoScroll = (e) => {
-		setAutoScroll(e.target.checked);
-		localStorage.setItem("autoScroll", e.target.checked);
-	};
-
-	useEffect(() => {
-		const savedAutoScroll = localStorage.getItem("autoScroll");
-		if (savedAutoScroll == null) localStorage.setItem("autoScroll", true);
-		else setAutoScroll(savedAutoScroll);
-	}, []);
 
 	useEffect(() => {
 		function handleClickOutsideDropdown(e) {
@@ -113,24 +101,6 @@ function NavBar() {
 					</Link>
 				</li>
 			</ul>
-
-			{/^\/messages/i.test(location.pathname) && (
-				<div className="custom-control custom-switch">
-					<label
-						htmlFor="toggleAutoScroll"
-						className="custom-control-label"
-					>
-						Autoscroll
-					</label>
-					<input
-						className="custom-control-input"
-						type="checkbox"
-						role="switch"
-						checked={autoScroll}
-						onClick={toggleAutoScroll}
-					/>
-				</div>
-			)}
 
 			{/* When the user is not logged in and the route is currently not /auth/login(/) or /auth/register(/) */}
 			{!username &&

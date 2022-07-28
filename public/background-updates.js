@@ -21,14 +21,3 @@ const getMessages = async () => {
 setInterval(async () => {
 	await getMessages();
 }, 5000);
-
-fetch("/api/messages").then(
-	async (res) => {
-		const data = await res.json();
-
-		if (res.status != 200) return setErrorMsg(`Error: ${data.message}`);
-
-		setChatList(data.chatList);
-	},
-	(err) => console.error(err)
-);

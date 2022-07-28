@@ -8,6 +8,8 @@ function ChatView() {
 	const [msgList, setMsgList] = useState([]);
 	const [errorMsg, setErrorMsg] = useState("");
 	const [selectedChat, setSelectedChat] = useState("");
+	const [selectedUsers, setSelectedUsers] = useState([]);
+	const [currentMsg, setCurrentMsg] = useState("");
 
 	const getMessages = () => {
 		fetch("/api/messages", {
@@ -41,7 +43,6 @@ function ChatView() {
 				credentials: "same-origin"
 			});
 			worker.onmessage = (e) => {
-				console.log("e.data :>> ", e.data);
 				if (Object.keys(e.data).includes("error"))
 					setErrorMsg(e.data.error);
 				else {
@@ -70,8 +71,8 @@ function ChatView() {
 		document.getElementById("chatList").addEventListener(
 			"mousedown",
 			function (ev) {
-				ev.stopPropagation();
-				if (ev.target && !ev.target.contains(el)) {
+				// if (ev.target && !ev.target.contains(el)) {
+				if (ev.target && !el.contains(ev.target)) {
 					el.classList.remove("active");
 				}
 			},
@@ -79,8 +80,27 @@ function ChatView() {
 		);
 	};
 
+	const createChat = (e) => {
+		fetch("/api/chats", {
+			method: "POST",
+			mode: "same-origin",
+			cache: "no-cache",
+			credentials: "same-origin",
+			headers: {
+				"Content-Type": "application/json"
+			},
+			body: JSON.stringify({
+				userList: selectedUsers
+			})
+		}).then(
+			(res) => {},
+			(err) => console.error(err)
+		);
+	};
+
+	// Send message when the send button is clicked
 	const sendMessage = () => {
-		if (!selectedChat) return undefined;
+		if (!selectedChat || !currentMsg) return undefined;
 		fetch("/api/messages", {
 			method: "POST",
 			mode: "same-origin",
@@ -90,8 +110,8 @@ function ChatView() {
 				"Content-Type": "application/json"
 			},
 			body: JSON.stringify({
-				recipient: "",
-				message: ""
+				recipient: selectedChat,
+				message: currentMsg
 			})
 		}).then(
 			(res) => {},
@@ -105,7 +125,7 @@ function ChatView() {
 				<div id="chatListPanel">
 					<button
 						className="btn btn-primary btn-block"
-						onClick={(e) => setUserSearchIsOpen(!userSearchIsOpen)}
+						onClick={(e) => setUserSearchIsOpen(true)}
 					>
 						<span className="material-symbols-rounded mr-2 align-middle">
 							add
@@ -132,8 +152,8 @@ function ChatView() {
 					{errorMsg && (
 						<h2 className="mx-auto text-center">{errorMsg}</h2>
 					)}
-					{userSearchIsOpen && (
-						<AnimatePresence>
+					<AnimatePresence>
+						{userSearchIsOpen && (
 							<motion.div
 								initial={{ opacity: 0, scale: 0 }}
 								animate={{ opacity: 1, scale: 1 }}
@@ -144,7 +164,7 @@ function ChatView() {
 								role="dialog"
 							>
 								<div
-									class="modal-dialog modal-dialog-centered"
+									class="modal-dialog modal-lg modal-dialog-centered"
 									role="document"
 								>
 									<div class="modal-content">
@@ -153,16 +173,20 @@ function ChatView() {
 												class="modal-title"
 												id="exampleModalLongTitle"
 											>
-												Modal title
+												User search
 											</h5>
 											<button
 												type="button"
-												class="close"
-												data-dismiss="modal"
 												aria-label="Close"
+												onClick={(e) =>
+													setUserSearchIsOpen(false)
+												}
 											>
-												<span aria-hidden="true">
-													&times;
+												<span
+													className="material-symbols-rounded"
+													aria-hidden="true"
+												>
+													close
 												</span>
 											</button>
 										</div>
@@ -171,22 +195,25 @@ function ChatView() {
 											<button
 												type="button"
 												class="btn btn-secondary"
-												data-dismiss="modal"
+												onClick={(e) => {
+													setUserSearchIsOpen(false);
+													setSelectedUsers([]);
+												}}
 											>
-												Close
+												Cancel
 											</button>
 											<button
 												type="button"
 												class="btn btn-primary"
 											>
-												Save changes
+												Create chat
 											</button>
 										</div>
 									</div>
 								</div>
 							</motion.div>
-						</AnimatePresence>
-					)}
+						)}
+					</AnimatePresence>
 					<ul id="messageList">
 						{!!msgList.length &&
 							msgList.map((msg) => {

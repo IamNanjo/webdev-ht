@@ -24,12 +24,6 @@ router.get("/messages", async (req, res) => {
 	res.sendFile(path.join(__dirname, "..", "..", "dist", "index.html"));
 });
 
-router.get("/documentation", (req, res) =>
-	res.sendFile(
-		path.join(__dirname, "..", "..", "documentation", "index.html")
-	)
-);
-
 router.put(
 	"/profile",
 	body("email").normalizeEmail().isEmail(),
