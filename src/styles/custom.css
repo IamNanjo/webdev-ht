@@ -1,0 +1,144 @@
+/* Hide scrollbars */
+::-webkit-scrollbar {
+	display: none;
+}
+@supports (scrollbar-width: none) {
+	*,
+	*::before,
+	*::after {
+		scrollbar-width: none;
+	}
+}
+
+a,
+span,
+img,
+.noselect {
+	user-select: none !important;
+}
+
+.material-symbols-rounded {
+	overflow: visible;
+}
+
+.message {
+	display: block;
+	margin-right: auto;
+	background-color: #2b2e2f;
+	max-width: 60%;
+	height: max-content;
+	padding: 1em;
+	margin: 2em;
+}
+.message * {
+	display: block;
+	max-width: 100%;
+	overflow-wrap: break-word;
+	word-wrap: break-word;
+	word-break: break-all;
+	white-space: break-spaces;
+	-webkit-hyphens: auto;
+	-moz-hyphens: auto;
+	hyphens: auto;
+}
+.message.float-right {
+	background-color: #1e3a45;
+	margin-left: auto;
+}
+.message > h2,
+#chatList h2 {
+	display: block;
+	width: 100%;
+	font-size: 1.5em;
+}
+.message > h2::after,
+#chatList h2::after {
+	content: "";
+	display: block;
+	background-color: #2a2a2a;
+	width: 100%;
+	height: 3px;
+	border-radius: 3px;
+	margin: 0.125em auto;
+}
+
+form {
+	width: 35%;
+}
+
+#chatView {
+	display: grid;
+	position: absolute;
+	top: 0;
+	left: 0;
+	grid-template-columns: 350px 1fr;
+	width: 100%;
+	max-width: 100%;
+	height: 100vh;
+	padding-top: 63px;
+	z-index: -1;
+}
+#chatView > * {
+	height: 100%;
+	overflow: scroll;
+	padding: 0;
+}
+
+#chatListPanel {
+	background-color: #343a40;
+	padding: 0 !important;
+}
+
+#chatList {
+	width: 100%;
+	padding: 0 !important;
+	user-select: none;
+}
+
+#chatList li {
+	display: block;
+	width: max-content;
+	width: 100%;
+	padding: 0.5em 2em;
+}
+#chatList li,
+#chatList li * {
+	cursor: pointer;
+}
+
+#messagePanel {
+	display: grid;
+	grid-template-columns: 1fr;
+	grid-template-rows: 1fr 100px;
+	width: 100%;
+	height: 100% !important;
+	padding: 0;
+	margin: 0;
+}
+
+#messageList {
+	display: flex;
+	flex-direction: column;
+	width: 100% !important;
+	height: 100% !important;
+	padding: 0 !important;
+}
+
+#messageForm {
+	display: flex;
+	width: 100%;
+	height: 100%;
+	border-top: 2px solid #2a2a2a;
+}
+#messageForm > textarea {
+	width: 90%;
+	height: 100%;
+	overflow: scroll;
+}
+#messageForm > button {
+	display: flex;
+	align-items: center;
+	width: 48px;
+	height: 48px;
+	margin: 0 auto;
+}

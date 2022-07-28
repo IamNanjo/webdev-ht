@@ -1,0 +1,34 @@
+const getMessages = async () => {
+	return await fetch("/api/messages", {
+		method: "GET",
+		mode: "same-origin",
+		cache: "no-cache",
+		credentials: "same-origin",
+		headers: {
+			"Content-Type": "application/json"
+		}
+	}).then(
+		async (res) => {
+			const data = await res.json();
+
+			if (res.status != 200) postMessage({ error: data.message });
+			else postMessage({ chatList: data.chatList });
+		},
+		(err) => console.error(err)
+	);
+};
+
+setInterval(async () => {
+	await getMessages();
+}, 5000);
+
+fetch("/api/messages").then(
+	async (res) => {
+		const data = await res.json();
+
+		if (res.status != 200) return setErrorMsg(`Error: ${data.message}`);
+
+		setChatList(data.chatList);
+	},
+	(err) => console.error(err)
+);

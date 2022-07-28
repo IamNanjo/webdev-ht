@@ -1,0 +1,21 @@
+site_name: Web-ohjelmointi ja web-palvelinohjelmointi harjoitustyö
+site_url: https://database-ht.nanjo.tech/documentation
+repo_url: https://gitlab.labranet.jamk.fi/AB6262/webdev-ht
+site_description: Tietokannat harjoitustyön dokumentaatio
+
+theme:
+  name: material
+  locale: fi
+  palette:
+    scheme: slate
+    primary: red
+  font:
+    text: Roboto
+    code: Roboto Mono
+  features:
+    - navigation.sections
+    - navigation.top
+
+site_dir: ../documentation
+extra_css:
+  - styles/smooth-scrolling.css

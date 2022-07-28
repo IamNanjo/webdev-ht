@@ -1,0 +1,11 @@
+{
+	"cwd": "server/",
+	"script": "server.js",
+	"watch": ["server/*"],
+	"instances": "max",
+	"exec_mode": "cluster",
+	"watch_options": {
+		"followSymlinks": false
+	},
+	"name": "webdev-ht"
+}
