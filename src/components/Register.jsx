@@ -66,7 +66,7 @@ function Register() {
 
 	return (
 		<main className="container">
-			<h1 className="text-center my-3">Create account</h1>,
+			<h1 className="text-center my-3">Create account</h1>
 			<form method="post" className="mx-auto" onSubmit={handleSubmit}>
 				<div className="form-group">
 					<label htmlFor="email">Email</label>

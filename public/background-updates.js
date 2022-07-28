@@ -1,5 +1,5 @@
 const getMessages = async () => {
-	return await fetch("/api/messages", {
+	return await fetch("/api/chats", {
 		method: "GET",
 		mode: "same-origin",
 		cache: "no-cache",

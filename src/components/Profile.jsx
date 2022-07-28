@@ -22,9 +22,8 @@ function Profile() {
 			credentials: "same-origin"
 		}).then(
 			async (res) => {
-				const data = await res.json();
-
 				if (res.status == 200) {
+					const data = await res.json();
 					setUserProfile(data);
 					setHeader(`${data.username}'s profile`);
 					document.title = `${data.username}'s profile | WhatUpp`;

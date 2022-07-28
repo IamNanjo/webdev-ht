@@ -2,7 +2,7 @@ const path = require("path");
 const { body, validationResult } = require("express-validator");
 const router = require("express").Router();
 
-const Users = require("../models/Users");
+const User = require("../models/User");
 
 router.use((req, res, next) => next());
 
@@ -37,8 +37,8 @@ router.put(
 
 		let { email, username } = req.body;
 
-		const emailTaken = await Users.findOne({ email });
-		const usernameTaken = await Users.findOne({ username });
+		const emailTaken = await User.findOne({ email });
+		const usernameTaken = await User.findOne({ username });
 
 		// If email or username is taken by someone other than the user requesting the update
 		if (emailTaken) {
@@ -52,7 +52,7 @@ router.put(
 					.json({ message: "Username already taken" });
 		}
 
-		Users.findById(req.user.id, async (err, user) => {
+		User.findById(req.user.id, async (err, user) => {
 			if (err) {
 				console.error(err);
 				return res.sendStatus(500);
@@ -75,7 +75,7 @@ router.put(
 router.delete("/profile", async (req, res) => {
 	if (!req.isAuthenticated()) return res.sendStatus(401);
 
-	const success = await Users.deleteOne({ _id: req.user.id });
+	const success = await User.deleteOne({ _id: req.user.id });
 
 	if (success) res.sendStatus(200);
 	else res.sendStatus(500);

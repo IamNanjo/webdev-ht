@@ -4,7 +4,7 @@ const bcrypt = require("bcrypt");
 const { body, validationResult } = require("express-validator");
 
 const mongoose = require("mongoose");
-const Users = require("../models/Users");
+const User = require("../models/User");
 
 const router = require("express").Router();
 
@@ -30,8 +30,8 @@ router.post(
 
 		let { email, username, password } = req.body;
 
-		const emailTaken = (await Users.find({ email: req.body.email })).length;
-		const usernameTaken = (await Users.find({ username: req.body.username }))
+		const emailTaken = (await User.find({ email: req.body.email })).length;
+		const usernameTaken = (await User.find({ username: req.body.username }))
 			.length;
 
 		if (emailTaken) {
@@ -45,7 +45,7 @@ router.post(
 			.then(async (hashedPassword) => {
 				password = hashedPassword;
 
-				const user = new Users({ email, username, password });
+				const user = new User({ email, username, password });
 
 				await user.save();
 

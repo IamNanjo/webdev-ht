@@ -24,7 +24,7 @@ const passport = require("passport");
 const LocalStrategy = require("passport-local");
 
 const mongoose = require("mongoose");
-const Users = require("./models/Users");
+const User = require("./models/User");
 
 const mongoURI = "mongodb://localhost:27017/webdev-ht";
 
@@ -40,7 +40,7 @@ mongoose.connect(mongoURI);
 
 passport.use(
 	new LocalStrategy((username, password, cb) => {
-		Users.findOne({ username }, (err, user) => {
+		User.findOne({ username }, (err, user) => {
 			if (err) return cb(err);
 			if (!user) {
 				return cb(null, false, {
