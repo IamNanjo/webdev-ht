@@ -2,7 +2,7 @@ const router = require("express").Router();
 const { body, validationResult } = require("express-validator");
 
 const User = require("../models/User");
-const Chat = require("../models/Chat");
+const { Chat, Message } = require("../models/Chat");
 
 router.use((req, res, next) => next());
 
@@ -59,23 +59,58 @@ router.post("/chats", body("userList").isArray(), async (req, res) => {
 			return res.sendStatus(400);
 	}
 
-	const chat = await new Chat({ members: [...userList, req.user.id] }).save();
+	const chat = new Chat({ members: [...userList, req.user.id] }).save(
+		(err) => {
+			if (err) {
+				console.error(err);
+				return res.sendStatus(500);
+			} else res.sendStatus(201);
+		}
+	);
 });
 
+router.delete("/chats", body("id").not().isEmpty().trim(), async (req, res) => {
+	if (!req.isAuthenticated()) return res.sendStatus(401);
+	const errors = validationResult(req);
+	if (!errors.isEmpty())
+		return res.status(400).json({ errors: errors.array() });
+
+	const { id } = req.body;
+
+	const chat = await Chat.findById(id);
+
+	// If the request user is not in the chat
+	if (!chat.members.includes(req.user.id)) return res.sendStatus(403);
+
+	// If chat would be left empty, delete it completely
+	if (chat.members.length <= 1) {
+		Chat.findByIdAndDelete(id);
+	} else {
+		chat.members = chat.members.filter((member) => member != req.user.id);
+	}
+
+	chat.save((err) => {
+		if (err) res.sendStatus(500);
+		else res.sendStatus(200);
+	});
+});
+
+// Send message
 router.post(
-	// Send message
 	"/messages",
 	body("recipient").not().isEmpty().trim(),
-	body("message").trim(),
+	body("message").not().isEmpty().trim(),
 	async (req, res) => {
 		const errors = validationResult(req);
 		if (!errors.isEmpty())
 			return res.status(400).json({ errors: errors.array() });
 
-		const { recipient } = req.body;
-		if (Object.keys(req.body).includes("message")) {
-			var { message } = req.body;
-		}
+		const { recipient, message } = req.body;
+
+		let chat = Chat.findById(recipient);
+		if (chat == null) return res.sendStatus(404);
+
+		chat.messages.push(new Message());
 	}
 );
 

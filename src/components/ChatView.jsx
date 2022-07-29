@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 function ChatView() {
 	const messagesEndRef = useRef(null);
 	const [userSearchIsOpen, setUserSearchIsOpen] = useState(false);
+	const [deleteConfirmation, setDeleteConfirmation] = useState("");
 	const [chatList, setChatList] = useState([]);
 	const [messages, setMessages] = useState([]);
 	const [selectedChat, setSelectedChat] = useState("");
@@ -32,6 +33,7 @@ function ChatView() {
 	};
 
 	useEffect(() => {
+		document.title = "WhatUpp";
 		getMessages();
 
 		// Background updates for messages
@@ -49,11 +51,13 @@ function ChatView() {
 		}
 
 		// Allow sending messages by pressing down Shift + Enter
-		document.getElementById("messageForm").addEventListener("keydown", (e) => {
-			if(e.shiftKey && e.key == "Enter") {
-				sendMessage();
-			}
-		})
+		document
+			.getElementById("messageForm")
+			.addEventListener("keydown", (e) => {
+				if (e.shiftKey && e.key == "Enter") {
+					sendMessage();
+				}
+			});
 	}, []);
 
 	useEffect(() => {
@@ -61,6 +65,50 @@ function ChatView() {
 		if (localStorage.getItem("autoScroll"))
 			messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
 	}, [messages]);
+
+	const createChat = (e) => {
+		fetch("/api/chats", {
+			method: "POST",
+			mode: "same-origin",
+			cache: "no-cache",
+			credentials: "same-origin",
+			headers: {
+				"Content-Type": "application/json"
+			},
+			body: JSON.stringify({
+				userList: selectedUsers
+			})
+		}).then(
+			(res) => {
+				setUserSearchIsOpen(false);
+				setSelectedUsers([]);
+				getMessages();
+			},
+			(err) => console.error(err)
+		);
+	};
+
+	const deleteChat = (confirmed = false) => {
+		if (!confirmed) return;
+
+		setDeleteConfirmation("");
+
+		fetch("/api/chats", {
+			method: "DELETE",
+			mode: "same-origin",
+			cache: "no-cache",
+			credentials: "same-origin",
+			headers: {
+				"Content-Type": "application/json"
+			},
+			body: JSON.stringify({ id: deleteConfirmation })
+		}).then(
+			(res) => {
+				if (res.status == 200) getMessages();
+			},
+			(err) => console.error(err)
+		);
+	};
 
 	const selectChat = (e, id) => {
 		if (selectedChat == id) return;
@@ -75,7 +123,7 @@ function ChatView() {
 		);
 
 		// Choose the correct chat from the list
-		const chat = chatList.filter((chat) => chat.id == id)[0];
+		const chat = chatList.filter((chat) => chat._id == id)[0];
 
 		// Select new chat (Loads messages into the view)
 		setSelectedChat(id);
@@ -112,24 +160,6 @@ function ChatView() {
 		} else {
 			setSelectedUsers([...selectedUsers, id]);
 		}
-	};
-
-	const createChat = (e) => {
-		fetch("/api/chats", {
-			method: "POST",
-			mode: "same-origin",
-			cache: "no-cache",
-			credentials: "same-origin",
-			headers: {
-				"Content-Type": "application/json"
-			},
-			body: JSON.stringify({
-				userList: selectedUsers
-			})
-		}).then(
-			(res) => getMessages(),
-			(err) => console.error(err)
-		);
 	};
 
 	const updateMessage = (e) => setCurrentMsg(e.target.value);
@@ -170,9 +200,17 @@ function ChatView() {
 				<ul id="chatList" className="list-group-flush bg-dark">
 					{!!chatList.length &&
 						chatList.map((chat) => {
+							const members = chat.members.map(
+								(member, i, arr) => {
+									if (i == arr.length - 1)
+										return member.username;
+									else return `${member.username}, `;
+								}
+							);
 							let lastMessage = "";
 							if (chat.messages.length) {
-								lastMessage = chat.messages.slice(-1)[0].message;
+								lastMessage =
+									chat.messages.slice(-1)[0].message;
 							}
 							return (
 								<li
@@ -180,17 +218,88 @@ function ChatView() {
 									className={`list-group-item border border-secondary `}
 									onMouseDown={(e) => selectChat(e, chat._id)}
 								>
-									<h2>{chat.members.map((member, i, arr) => {
-										if(i == arr.length - 1) return member.username;
-										else return `${member.username}, `
-									})}</h2>
-									<div>{lastMessage}</div>
+									<h2>
+										<span
+											className="material-symbols-rounded text-danger align-middle pr-2"
+											onClick={(e) => {
+												e.stopPropagation();
+												setDeleteConfirmation(chat._id);
+											}}
+										>
+											delete
+										</span>
+										{!chat.members.length
+											? "Empty chat"
+											: members}
+									</h2>
+									{lastMessage && <div>{lastMessage}</div>}
 								</li>
 							);
 						})}
 				</ul>
 			</div>
 			<div id="messagePanel">
+				<AnimatePresence>
+					{deleteConfirmation && (
+						<motion.div
+							initial={{ opacity: 0, scale: 0 }}
+							animate={{ opacity: 1, scale: 1 }}
+							transition={{ duration: 0.6 }}
+							exit={{ opacity: 0 }}
+							classList="modal"
+							tabindex="-1"
+							role="dialog"
+						>
+							<div
+								class="modal-dialog modal-sm modal-dialog-centered"
+								role="document"
+							>
+								<div class="modal-content">
+									<div class="modal-header">
+										<h5
+											id="exampleModalLongTitle"
+											class="modal-title"
+										>
+											Are you sure you want to delete this
+											chat?
+										</h5>
+										<span
+											className="material-symbols-rounded"
+											aria-label="Close"
+											aria-hidden="true"
+											onClick={(e) =>
+												setDeleteConfirmation("")
+											}
+											style={{ cursor: "pointer" }}
+										>
+											close
+										</span>
+									</div>
+									<div class="d-flex justify-content-around modal-body">
+										<button
+											type="button"
+											class="btn btn-secondary"
+											onClick={(e) =>
+												setDeleteConfirmation("")
+											}
+										>
+											Cancel
+										</button>
+										<button
+											type="button"
+											class="btn btn-danger"
+											onClick={(e) => {
+												deleteChat(true);
+											}}
+										>
+											Delete chat
+										</button>
+									</div>
+								</div>
+							</div>
+						</motion.div>
+					)}
+				</AnimatePresence>
 				<AnimatePresence>
 					{userSearchIsOpen && (
 						<motion.div
@@ -273,7 +382,9 @@ function ChatView() {
 										<button
 											type="button"
 											class="btn btn-primary"
-											onClick={createChat}
+											onClick={(e) => {
+												createChat();
+											}}
 										>
 											Create chat
 										</button>
@@ -289,7 +400,7 @@ function ChatView() {
 							if (msg.sender == "You") {
 								return (
 									<li
-										key={msg.id}
+										key={msg._id}
 										className="message rounded border float-right"
 									>
 										<div>{msg.message}</div>
@@ -298,7 +409,7 @@ function ChatView() {
 							} else if (!selectedChat.isGroupChat) {
 								return (
 									<li
-										key={msg.id}
+										key={msg._id}
 										className="message rounded border"
 									>
 										<div>{msg.message}</div>
@@ -307,7 +418,7 @@ function ChatView() {
 							} else {
 								return (
 									<li
-										key={msg.id}
+										key={msg._id}
 										className="message rounded border"
 									>
 										<h2>{msg.sender}</h2>

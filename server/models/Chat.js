@@ -15,4 +15,7 @@ const Chat = new Schema({
 	createdOn: { type: Date, default: Date.now }
 });
 
-module.exports = model("Chat", Chat);
+module.exports = {
+	Chat: model("Chat", Chat),
+	Message: model("Message", Message)
+};
