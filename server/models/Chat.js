@@ -3,7 +3,6 @@ const { Schema, model } = require("mongoose");
 // Sender refers to User ID
 const Message = new Schema({
 	sender: { type: Schema.Types.ObjectId, required: true, ref: "User" },
-	recipient: { type: String, required: true },
 	content: { type: String, required: true },
 	createdOn: { type: Date, default: Date.now }
 });
@@ -12,10 +11,7 @@ const Message = new Schema({
 const Chat = new Schema({
 	members: { type: [Schema.Types.ObjectId], required: true, ref: "User" },
 	messages: { type: [Message], default: [] },
-	createdOn: { type: Date, default: Date.now }
+	createdOn: { type: Date, default: Date.now },
 });
 
-module.exports = {
-	Chat: model("Chat", Chat),
-	Message: model("Message", Message)
-};
+module.exports = model("Chat", Chat);

@@ -2,7 +2,7 @@ const router = require("express").Router();
 const { body, validationResult } = require("express-validator");
 
 const User = require("../models/User");
-const { Chat, Message } = require("../models/Chat");
+const Chat = require("../models/Chat");
 
 router.use((req, res, next) => next());
 
@@ -36,10 +36,15 @@ router.get(
 router.get("/chats", async (req, res) => {
 	if (!req.isAuthenticated()) return res.sendStatus(401);
 
-	const chats = await Chat.find({ members: req.user.id }).populate({
-		path: "members",
-		select: "_id username"
-	});
+	const chats = await Chat.find({ members: req.user.id })
+		.populate({
+			path: "members",
+			select: "_id username"
+		})
+		.populate({
+			path: "messages.sender",
+			select: "_id username"
+		});
 
 	res.json({ chatList: chats });
 });
@@ -47,6 +52,10 @@ router.get("/chats", async (req, res) => {
 // Create new chat
 router.post("/chats", body("userList").isArray(), async (req, res) => {
 	if (!req.isAuthenticated()) return res.sendStatus(401);
+
+	const errors = validationResult(req);
+	if (!errors.isEmpty())
+		return res.status(400).json({ errors: errors.array() });
 
 	const { userList } = req.body;
 
@@ -59,14 +68,12 @@ router.post("/chats", body("userList").isArray(), async (req, res) => {
 			return res.sendStatus(400);
 	}
 
-	const chat = new Chat({ members: [...userList, req.user.id] }).save(
-		(err) => {
-			if (err) {
-				console.error(err);
-				return res.sendStatus(500);
-			} else res.sendStatus(201);
-		}
-	);
+	new Chat({ members: [req.user.id, ...userList] }).save((err) => {
+		if (err) {
+			console.error(err);
+			return res.sendStatus(500);
+		} else res.sendStatus(201);
+	});
 });
 
 router.delete("/chats", body("id").not().isEmpty().trim(), async (req, res) => {
@@ -84,15 +91,18 @@ router.delete("/chats", body("id").not().isEmpty().trim(), async (req, res) => {
 
 	// If chat would be left empty, delete it completely
 	if (chat.members.length <= 1) {
-		Chat.findByIdAndDelete(id);
+		Chat.findByIdAndDelete(id, (err) => {
+			if (err) console.error(err);
+			else res.sendStatus(200);
+		});
 	} else {
 		chat.members = chat.members.filter((member) => member != req.user.id);
-	}
 
-	chat.save((err) => {
-		if (err) res.sendStatus(500);
-		else res.sendStatus(200);
-	});
+		chat.save((err) => {
+			if (err) res.sendStatus(500);
+			else res.sendStatus(200);
+		});
+	}
 });
 
 // Send message
@@ -107,10 +117,26 @@ router.post(
 
 		const { recipient, message } = req.body;
 
-		let chat = Chat.findById(recipient);
+		let chat = await Chat.findById(recipient);
 		if (chat == null) return res.sendStatus(404);
 
-		chat.messages.push(new Message());
+		Chat.findByIdAndUpdate(
+			recipient,
+			{
+				$push: {
+					messages: {
+						sender: req.user.id,
+						content: message
+					}
+				}
+			},
+			(err) => {
+				if (err) {
+					console.error(err);
+					res.sendStatus(500);
+				} else res.sendStatus(201);
+			}
+		);
 	}
 );
 

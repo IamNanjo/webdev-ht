@@ -17,14 +17,16 @@ img,
 	user-select: none !important;
 }
 
-.material-symbols-rounded {
-	overflow: visible;
+.modal-content {
+	margin-left: 150px;
+	box-shadow: 2px 2px 2px 2px #222222;
 }
 
 .message {
 	display: block;
 	margin-right: auto;
 	background-color: #2b2e2f;
+	width: max-content;
 	max-width: 60%;
 	height: max-content;
 	padding: 1em;
@@ -61,6 +63,9 @@ img,
 	height: 3px;
 	border-radius: 3px;
 	margin: 0.125em auto;
+}
+.message:not(.float-right) > h2::after {
+	background-color: #666666;
 }
 #chatList h2:last-child {
 	margin: 0.125em;
@@ -125,9 +130,10 @@ form {
 #messageList {
 	display: flex;
 	flex-direction: column;
-	width: 100% !important;
-	height: 100% !important;
-	padding: 0 !important;
+	width: 100%;
+	min-height: calc(100% - 100px);
+	padding: 0;
+	margin-bottom: 100px;
 }
 
 #messageForm {

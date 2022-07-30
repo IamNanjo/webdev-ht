@@ -3,9 +3,9 @@
 	"private": true,
 	"version": "0.0.0",
 	"scripts": {
-		"start": "pm2 start pm2-process.json",
+		"start": "NODE_ENV=production pm2 start pm2-process.json",
 		"stop": "pm2 stop pm2-process.json && pm2 delete pm2-process.json",
-		"restart": "pm2 restart pm2-process.json",
+		"restart": "NODE_ENV=production pm2 restart pm2-process.json",
 		"dev": "vite",
 		"build": "vite build",
 		"preview": "vite preview"

@@ -54,6 +54,9 @@ function NavBar() {
 	}, [dropdownRef]); // Ref dependency: run when ref is updated
 
 	useEffect(() => {
+		// Clear console so that errors from other pages don't show up
+		console.clear();
+		
 		if (/^\/auth\/logout/i.test(location.pathname)) return logout();
 
 		fetch("/api/profile", {

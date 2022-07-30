@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 
 function ChatView() {
 	const messagesEndRef = useRef(null);
+	const [loggedInUser, setLoggedInUser] = useState("");
 	const [userSearchIsOpen, setUserSearchIsOpen] = useState(false);
 	const [deleteConfirmation, setDeleteConfirmation] = useState("");
 	const [chatList, setChatList] = useState([]);
@@ -12,7 +13,7 @@ function ChatView() {
 	const [selectedUsers, setSelectedUsers] = useState([]);
 	const [currentMsg, setCurrentMsg] = useState("");
 
-	const getMessages = () => {
+	const getMessages = () =>
 		fetch("/api/chats", {
 			method: "GET",
 			mode: "same-origin",
@@ -27,6 +28,36 @@ function ChatView() {
 				const data = await res.json();
 
 				setChatList(data.chatList);
+
+				return data.chatList;
+			},
+			(err) => console.error(err)
+		);
+
+	const sendMessage = (e) => {
+		e.preventDefault();
+
+		const recipient = selectedChat;
+		const message = currentMsg;
+
+		if (!recipient || !message) return;
+
+		fetch("/api/messages", {
+			method: "POST",
+			mode: "same-origin",
+			cache: "no-cache",
+			credentials: "same-origin",
+			headers: {
+				"Content-Type": "application/json"
+			},
+			body: JSON.stringify({
+				recipient,
+				message
+			})
+		}).then(
+			() => {
+				setCurrentMsg("");
+				getMessages();
 			},
 			(err) => console.error(err)
 		);
@@ -34,7 +65,23 @@ function ChatView() {
 
 	useEffect(() => {
 		document.title = "WhatUpp";
-		getMessages();
+
+		fetch("/api/profile", {
+			method: "GET",
+			mode: "same-origin",
+			cache: "no-cache",
+			credentials: "same-origin",
+			headers: {
+				"Content-Type": "application/json"
+			}
+		}).then(
+			async (res) => {
+				const user = await res.json();
+				setLoggedInUser(user.id);
+				getMessages();
+			},
+			(err) => console.error(err)
+		);
 
 		// Background updates for messages
 		if (typeof Worker !== "undefined") {
@@ -49,22 +96,20 @@ function ChatView() {
 		} else {
 			setInterval(getMessages, 5000);
 		}
-
-		// Allow sending messages by pressing down Shift + Enter
-		document
-			.getElementById("messageForm")
-			.addEventListener("keydown", (e) => {
-				if (e.shiftKey && e.key == "Enter") {
-					sendMessage();
-				}
-			});
 	}, []);
 
 	useEffect(() => {
 		// Scroll to bottom whenever message list changes
-		if (localStorage.getItem("autoScroll"))
-			messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+		messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
 	}, [messages]);
+
+	useEffect(() => {
+		if (selectedChat) {
+			// Choose the correct chat from the list whenever a new chat is selected or chatList is updated
+			const chat = chatList.filter((chat) => chat._id == selectedChat)[0];
+			setMessages(chat.messages);
+		}
+	}, [selectedChat, chatList]);
 
 	const createChat = (e) => {
 		fetch("/api/chats", {
@@ -92,6 +137,10 @@ function ChatView() {
 		if (!confirmed) return;
 
 		setDeleteConfirmation("");
+		if (selectedChat == deleteConfirmation) {
+			setSelectedChat("");
+			setMessages([]);
+		}
 
 		fetch("/api/chats", {
 			method: "DELETE",
@@ -122,12 +171,8 @@ function ChatView() {
 			}
 		);
 
-		// Choose the correct chat from the list
-		const chat = chatList.filter((chat) => chat._id == id)[0];
-
 		// Select new chat (Loads messages into the view)
 		setSelectedChat(id);
-		setMessages(chat.messages);
 
 		e.currentTarget.classList.add("active");
 	};
@@ -162,30 +207,153 @@ function ChatView() {
 		}
 	};
 
-	const updateMessage = (e) => setCurrentMsg(e.target.value);
-
-	// Send message when the send button is clicked
-	const sendMessage = () => {
-		if (!selectedChat || !currentMsg) return undefined;
-		fetch("/api/messages", {
-			method: "POST",
-			mode: "same-origin",
-			cache: "no-cache",
-			credentials: "same-origin",
-			headers: {
-				"Content-Type": "application/json"
-			},
-			body: JSON.stringify({
-				recipient: selectedChat,
-				message: currentMsg
-			})
-		}).then(
-			(res) => getMessages(),
-			(err) => console.error(err)
-		);
-	};
-
-	return (
+	return [
+		<AnimatePresence>
+			{deleteConfirmation && (
+				<motion.div
+					initial={{ opacity: 0, scale: 0 }}
+					animate={{ opacity: 1, scale: 1 }}
+					transition={{ duration: 0.4 }}
+					exit={{ opacity: 0 }}
+					classList="modal"
+					tabindex="-1"
+					role="dialog"
+				>
+					<div
+						class="modal-dialog modal-dialog-centered"
+						role="document"
+					>
+						<div class="modal-content border border-secondary">
+							<div class="modal-header">
+								<h5
+									id="exampleModalLongTitle"
+									class="modal-title"
+								>
+									Are you sure you want to delete this chat?
+								</h5>
+								<span
+									className="material-symbols-rounded"
+									aria-label="Close"
+									aria-hidden="true"
+									onClick={(e) => setDeleteConfirmation("")}
+									style={{ cursor: "pointer" }}
+								>
+									close
+								</span>
+							</div>
+							<div class="d-flex justify-content-around modal-body">
+								<button
+									type="button"
+									class="btn btn-secondary"
+									onClick={(e) => setDeleteConfirmation("")}
+								>
+									Cancel
+								</button>
+								<button
+									type="button"
+									class="btn btn-danger"
+									onClick={(e) => {
+										deleteChat(true);
+									}}
+								>
+									Delete chat
+								</button>
+							</div>
+						</div>
+					</div>
+				</motion.div>
+			)}
+		</AnimatePresence>,
+		<AnimatePresence>
+			{userSearchIsOpen && (
+				<motion.div
+					initial={{ opacity: 0, scale: 0 }}
+					animate={{ opacity: 1, scale: 1 }}
+					transition={{ duration: 0.4 }}
+					exit={{ opacity: 0 }}
+					classList="modal"
+					tabindex="-1"
+					role="dialog"
+				>
+					<div
+						class="modal-dialog modal-lg modal-dialog-centered"
+						role="document"
+					>
+						<div class="modal-content border border-secondary">
+							<div class="modal-header">
+								<h5
+									id="exampleModalLongTitle"
+									class="modal-title noselect"
+								>
+									Select users
+								</h5>
+								<span
+									className="material-symbols-rounded"
+									aria-label="Close"
+									aria-hidden="true"
+									onClick={(e) => {
+										setUserSearchIsOpen(false);
+										setSelectedUsers([]);
+									}}
+									style={{ cursor: "pointer" }}
+								>
+									close
+								</span>
+							</div>
+							<div class="modal-body">
+								<input
+									className="form-control mb-2"
+									type="text"
+									placeholder="Search"
+									autoFocus
+									onInput={searchUsers}
+									onFocus={searchUsers}
+								/>
+								<ul className="list-group bg-dark p-5 overflow-scroll">
+									{users.length > 0 &&
+										users.map((user) => (
+											<li
+												className={`noselect list-group-item ${
+													selectedUsers.includes(
+														user._id
+													)
+														? "list-group-item-success"
+														: null
+												}`}
+												onClick={(e) =>
+													toggleUser(e, user._id)
+												}
+											>
+												{user.username}
+											</li>
+										))}
+								</ul>
+							</div>
+							<div class="modal-footer">
+								<button
+									type="button"
+									class="btn btn-secondary"
+									onClick={(e) => {
+										setUserSearchIsOpen(false);
+										setSelectedUsers([]);
+									}}
+								>
+									Cancel
+								</button>
+								<button
+									type="button"
+									class="btn btn-primary"
+									disabled={selectedUsers.length < 1}
+									onClick={(e) => createChat()}
+								>
+									Create chat
+								</button>
+							</div>
+						</div>
+					</div>
+				</motion.div>
+			)}
+		</AnimatePresence>,
 		<main id="chatView">
 			<div id="chatListPanel">
 				<button
@@ -198,19 +366,24 @@ function ChatView() {
 					New chat
 				</button>
 				<ul id="chatList" className="list-group-flush bg-dark">
-					{!!chatList.length &&
+					{chatList.length > 0 &&
 						chatList.map((chat) => {
-							const members = chat.members.map(
-								(member, i, arr) => {
-									if (i == arr.length - 1)
-										return member.username;
-									else return `${member.username}, `;
+							let members = "";
+							if (chat.members.length <= 1) members = "Empty chat";
+							else {
+								for (let i = 0; i < chat.members.length; i++) {
+									if (chat.members[i]._id == loggedInUser)
+										members += "You";
+									else members += chat.members[i].username;
+
+									if (i != chat.members.length - 1)
+										members += ", ";
 								}
-							);
+							}
 							let lastMessage = "";
-							if (chat.messages.length) {
+							if (chat.messages.length > 0) {
 								lastMessage =
-									chat.messages.slice(-1)[0].message;
+									chat.messages.slice(-1)[0].content;
 							}
 							return (
 								<li
@@ -220,7 +393,11 @@ function ChatView() {
 								>
 									<h2>
 										<span
-											className="material-symbols-rounded text-danger align-middle pr-2"
+											className={`material-symbols-rounded align-middle pr-2 ${
+												selectedChat == chat._id
+													? null
+													: "text-danger"
+											}`}
 											onClick={(e) => {
 												e.stopPropagation();
 												setDeleteConfirmation(chat._id);
@@ -232,187 +409,27 @@ function ChatView() {
 											? "Empty chat"
 											: members}
 									</h2>
-									{lastMessage && <div>{lastMessage}</div>}
+									{lastMessage != "" && (
+										<div style={{ paddingLeft: "33px" }}>
+											{lastMessage}
+										</div>
+									)}
 								</li>
 							);
 						})}
 				</ul>
 			</div>
 			<div id="messagePanel">
-				<AnimatePresence>
-					{deleteConfirmation && (
-						<motion.div
-							initial={{ opacity: 0, scale: 0 }}
-							animate={{ opacity: 1, scale: 1 }}
-							transition={{ duration: 0.6 }}
-							exit={{ opacity: 0 }}
-							classList="modal"
-							tabindex="-1"
-							role="dialog"
-						>
-							<div
-								class="modal-dialog modal-sm modal-dialog-centered"
-								role="document"
-							>
-								<div class="modal-content">
-									<div class="modal-header">
-										<h5
-											id="exampleModalLongTitle"
-											class="modal-title"
-										>
-											Are you sure you want to delete this
-											chat?
-										</h5>
-										<span
-											className="material-symbols-rounded"
-											aria-label="Close"
-											aria-hidden="true"
-											onClick={(e) =>
-												setDeleteConfirmation("")
-											}
-											style={{ cursor: "pointer" }}
-										>
-											close
-										</span>
-									</div>
-									<div class="d-flex justify-content-around modal-body">
-										<button
-											type="button"
-											class="btn btn-secondary"
-											onClick={(e) =>
-												setDeleteConfirmation("")
-											}
-										>
-											Cancel
-										</button>
-										<button
-											type="button"
-											class="btn btn-danger"
-											onClick={(e) => {
-												deleteChat(true);
-											}}
-										>
-											Delete chat
-										</button>
-									</div>
-								</div>
-							</div>
-						</motion.div>
-					)}
-				</AnimatePresence>
-				<AnimatePresence>
-					{userSearchIsOpen && (
-						<motion.div
-							initial={{ opacity: 0, scale: 0 }}
-							animate={{ opacity: 1, scale: 1 }}
-							transition={{ duration: 0.6 }}
-							exit={{ opacity: 0 }}
-							classList="modal"
-							tabindex="-1"
-							role="dialog"
-						>
-							<div
-								class="modal-dialog modal-lg modal-dialog-centered"
-								role="document"
-							>
-								<div class="modal-content">
-									<div class="modal-header">
-										<h5
-											id="exampleModalLongTitle"
-											class="modal-title"
-										>
-											Select users
-										</h5>
-										<span
-											className="material-symbols-rounded"
-											aria-label="Close"
-											aria-hidden="true"
-											onClick={(e) => {
-												setUserSearchIsOpen(false);
-												setSelectedUsers([]);
-											}}
-											style={{ cursor: "pointer" }}
-										>
-											close
-										</span>
-									</div>
-									<div class="modal-body">
-										<input
-											className="form-control mb-2"
-											type="text"
-											placeholder="Search"
-											autoFocus
-											onInput={searchUsers}
-											onFocus={searchUsers}
-										/>
-										<ul className="list-group bg-dark p-5 overflow-scroll">
-											{users.length > 0 &&
-												users.map((user) => (
-													<li
-														className={`noselect list-group-item ${
-															selectedUsers.includes(
-																user._id
-															)
-																? "list-group-item-success"
-																: null
-														}`}
-														onClick={(e) =>
-															toggleUser(
-																e,
-																user._id
-															)
-														}
-													>
-														{user.username}
-													</li>
-												))}
-										</ul>
-									</div>
-									<div class="modal-footer">
-										<button
-											type="button"
-											class="btn btn-secondary"
-											onClick={(e) => {
-												setUserSearchIsOpen(false);
-												setSelectedUsers([]);
-											}}
-										>
-											Cancel
-										</button>
-										<button
-											type="button"
-											class="btn btn-primary"
-											onClick={(e) => {
-												createChat();
-											}}
-										>
-											Create chat
-										</button>
-									</div>
-								</div>
-							</div>
-						</motion.div>
-					)}
-				</AnimatePresence>
 				<ul id="messageList">
-					{!!messages.length &&
+					{messages.length > 0 &&
 						messages.map((msg) => {
-							if (msg.sender == "You") {
+							if (msg.sender._id == loggedInUser) {
 								return (
 									<li
 										key={msg._id}
 										className="message rounded border float-right"
 									>
-										<div>{msg.message}</div>
-									</li>
-								);
-							} else if (!selectedChat.isGroupChat) {
-								return (
-									<li
-										key={msg._id}
-										className="message rounded border"
-									>
-										<div>{msg.message}</div>
+										<div>{msg.content}</div>
 									</li>
 								);
 							} else {
@@ -421,8 +438,8 @@ function ChatView() {
 										key={msg._id}
 										className="message rounded border"
 									>
-										<h2>{msg.sender}</h2>
-										<div>{msg.message}</div>
+										<h2>{msg.sender.username}</h2>
+										<div>{msg.content}</div>
 									</li>
 								);
 							}
@@ -432,23 +449,30 @@ function ChatView() {
 				<form
 					id="messageForm"
 					className="form-inline"
-					onsubmit={sendMessage}
+					onSubmit={sendMessage}
 				>
 					<textarea
+						id="messageField"
 						className="form-control"
 						placeholder="Type message here..."
-						onInput={updateMessage}
+						disabled={!selectedChat}
+						value={currentMsg}
+						onInput={(e) => setCurrentMsg(e.target.value)}
+						onKeyDown={(e) => {
+							if (e.shiftKey && e.key == "Enter") sendMessage(e);
+						}}
 					></textarea>
 					<button
 						className="btn btn-primary rounded-circle"
 						type="submit"
+						disabled={!currentMsg || !selectedChat}
 					>
 						<span className="material-symbols-rounded">send</span>
 					</button>
 				</form>
 			</div>
 		</main>
-	);
+	];
 }
 
 export default ChatView;

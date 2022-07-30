@@ -78,11 +78,12 @@ passport.deserializeUser(function (user, cb) {
 	process.nextTick(() => cb(null, user));
 });
 
+// Paths to static files
 const rootPath = path.join(__dirname, "..", "dist");
 const docPath = path.join(__dirname, "..", "documentation");
 
+// Express config / middlewares
 app.set("trust proxy", 1);
-// Session configuration
 app.use(
 	session({
 		secret: "nmxLC3bG6rYPmR$B$CFDi!iR$qn34yonk7t5AHTx",
@@ -102,4 +103,5 @@ app.use("/auth", authRouter);
 app.use("/api", apiRouter);
 app.use("/", express.static(rootPath, { index: false }));
 
+// Listen on this port (https//webdev-ht.nanjo.tech uses a reverse proxy in Apache)
 server.listen(10443, () => console.log("Server listening on ", 10443));
