@@ -1,5 +1,5 @@
-const getMessages = async () => {
-	return await fetch("/api/chats", {
+const getMessages = () => {
+	return fetch("/api/chats", {
 		method: "GET",
 		mode: "same-origin",
 		cache: "no-cache",
@@ -18,6 +18,6 @@ const getMessages = async () => {
 	);
 };
 
-setInterval(async () => {
-	await getMessages();
+setInterval(() => {
+	getMessages();
 }, 2500);
