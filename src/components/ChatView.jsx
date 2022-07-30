@@ -94,7 +94,7 @@ function ChatView() {
 				}
 			};
 		} else {
-			setInterval(getMessages, 5000);
+			setInterval(getMessages, 2500);
 		}
 	}, []);
 

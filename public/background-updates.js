@@ -20,4 +20,4 @@ const getMessages = async () => {
 
 setInterval(async () => {
 	await getMessages();
-}, 5000);
+}, 2500);

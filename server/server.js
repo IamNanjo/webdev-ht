@@ -28,7 +28,7 @@ const User = require("./models/User");
 
 const mongoURI = "mongodb://localhost:27017/webdev-ht";
 
-// Where to store sessions
+// Store for sessions
 const store = new MongoDBStore({
 	uri: mongoURI,
 	collection: "sessions"
@@ -39,6 +39,7 @@ store.on("error", (err) => console.error(err));
 mongoose.connect(mongoURI);
 
 passport.use(
+	// This is the function that will be called whenever a user needs to be logged in
 	new LocalStrategy((username, password, cb) => {
 		User.findOne({ username }, (err, user) => {
 			if (err) return cb(err);
@@ -64,6 +65,9 @@ passport.use(
 	})
 );
 
+// This is where we choose what we save in cookies
+// In this app we only need the user ID, email and username
+// This app could also work with just the ID but this way we don't need as many database queries
 passport.serializeUser(function (user, cb) {
 	process.nextTick(() => {
 		return cb(null, {
@@ -86,6 +90,8 @@ const docPath = path.join(__dirname, "..", "documentation");
 app.set("trust proxy", 1);
 app.use(
 	session({
+		// Normally you should never reveal this secret.
+		// This secret is used to encrypt cookies.
 		secret: "nmxLC3bG6rYPmR$B$CFDi!iR$qn34yonk7t5AHTx",
 		resave: true,
 		saveUninitialized: false,
