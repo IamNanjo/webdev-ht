@@ -107,7 +107,10 @@ function ChatView() {
 		if (selectedChat) {
 			// Choose the correct chat from the list whenever a new chat is selected or chatList is updated
 			const chat = chatList.filter((chat) => chat._id == selectedChat)[0];
-			setMessages(chat.messages);
+			// We can just compare the array length because this app does not allow deleting messages
+			if (chat.messages.length != messages.length) {
+				setMessages(chat.messages);
+			}
 		}
 	}, [selectedChat, chatList]);
 
@@ -423,7 +426,19 @@ function ChatView() {
 				<ul id="messageList">
 					{messages.length > 0 &&
 						messages.map((msg) => {
-							if (msg.sender._id == loggedInUser) {
+							// If the msg.sender is null, that means the user has been deleted
+							if (msg.sender == null) {
+								return (
+									<li
+										key={msg._id}
+										className="message rounded border"
+									>
+										<h2>Deleted user</h2>
+										<div>{msg.content}</div>
+									</li>
+								);
+							}
+							else if (msg.sender._id == loggedInUser) {
 								return (
 									<li
 										key={msg._id}
