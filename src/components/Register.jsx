@@ -83,6 +83,7 @@ function Register() {
 							name="email"
 							type="email"
 							autoComplete="email"
+							placeholder="email@example.com"
 							required
 							autoFocus
 							onInput={updateEmail}
@@ -103,6 +104,7 @@ function Register() {
 							name="username"
 							type="text"
 							autoComplete="username"
+							placeholder="User123"
 							required
 							onInput={updateUsername}
 						/>
@@ -124,6 +126,8 @@ function Register() {
 							name="password"
 							type="password"
 							autoComplete="new-password"
+							placeholder="••••••"
+							pattern=".{6,}"
 							title="Minimum 6 characters"
 							required
 							onInput={updatePassword}
@@ -178,7 +182,7 @@ function Register() {
 						<span className="material-symbols-rounded mr-2 align-middle">
 							{passwordHasSymbols == true ? "done" : "close"}
 						</span>
-						Has symbols
+						Has special characters
 					</li>
 				</ul>
 				<div className="form-group">
@@ -195,6 +199,7 @@ function Register() {
 							name="password-confirm"
 							type="password"
 							autoComplete="new-password"
+							placeholder="••••••"
 							required
 							onInput={updatePasswordConfirm}
 						/>

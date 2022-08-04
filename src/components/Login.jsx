@@ -59,6 +59,7 @@ function Login() {
 							name="username"
 							type="text"
 							autoComplete="username"
+							placeholder="User123"
 							required
 							autoFocus
 							onInput={updateUsername}
@@ -79,6 +80,7 @@ function Login() {
 							name="password"
 							type="password"
 							autoComplete="current-password"
+							placeholder="••••••"
 							required
 							onInput={updatePassword}
 						/>
