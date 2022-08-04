@@ -13,18 +13,22 @@ router.get("/", async (req, res) => {
 	res.sendFile(path.join(__dirname, "..", "..", "dist", "index.html"));
 });
 
+// Profile page
 router.get("/profile", async (req, res) => {
 	if (!req.isAuthenticated()) return res.redirect("/auth/login");
 
 	res.sendFile(path.join(__dirname, "..", "..", "dist", "index.html"));
 });
 
+// Messages page
 router.get("/messages", async (req, res) => {
 	if (!req.isAuthenticated()) return res.redirect("/auth/login");
 
 	res.sendFile(path.join(__dirname, "..", "..", "dist", "index.html"));
 });
 
+// Update account email or username
+// TODO: allow changing password using old password
 router.put(
 	"/profile",
 	body("email").normalizeEmail().isEmail(),
@@ -38,21 +42,21 @@ router.put(
 
 		let { email, username } = req.body;
 
-		const emailTaken = await User.findOne({ email });
-		const usernameTaken = await User.findOne({ username });
+		// Await these calls in parallel
+		const [emailTaken, usernameTaken] = Promise.all([
+			await User.findOne({ email }),
+			await User.findOne({ username })
+		]);
 
 		// If email or username is taken by someone other than the user requesting the update
-		if (emailTaken) {
-			if (emailTaken._id != req.user.id)
-				return res.status(409).json({ message: "Email already taken" });
+		if (emailTaken && emailTaken._id != req.user.id) {
+			return res.status(409).json({ message: "Email already taken" });
 		}
-		if (usernameTaken) {
-			if (usernameTaken._id != req.user.id)
-				return res
-					.status(409)
-					.json({ message: "Username already taken" });
+		if (usernameTaken && usernameTaken._id != req.user.id) {
+			return res.status(409).json({ message: "Username already taken" });
 		}
 
+		// Get user from the database and update email and username
 		User.findById(req.user.id, async (err, user) => {
 			if (err) {
 				console.error(err);
@@ -73,6 +77,8 @@ router.put(
 	}
 );
 
+// Delete account
+// TODO: Make sure all chats are deleted before the user is deleted
 router.delete("/profile", async (req, res) => {
 	if (!req.isAuthenticated()) return res.sendStatus(401);
 

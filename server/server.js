@@ -12,6 +12,7 @@ const rootRouter = require("./routes/root");
 const authRouter = require("./routes/auth");
 const apiRouter = require("./routes/api");
 
+// HTTPS server config (certificate files)
 const server = createServer(
 	{
 		key: readFileSync(`/etc/letsencrypt/live/nanjo.tech/privkey.pem`),
@@ -23,6 +24,7 @@ const server = createServer(
 const passport = require("passport");
 const LocalStrategy = require("passport-local");
 
+// MongoDB config
 const mongoose = require("mongoose");
 const User = require("./models/User");
 
@@ -41,6 +43,7 @@ mongoose.connect(mongoURI);
 passport.use(
 	// This is the function that will be called whenever a user needs to be logged in
 	new LocalStrategy((username, password, cb) => {
+		// Looks for a user from the database and checks that the user gave the correct password
 		User.findOne({ username }, (err, user) => {
 			if (err) return cb(err);
 			if (!user) {
@@ -71,6 +74,7 @@ passport.use(
 passport.serializeUser(function (user, cb) {
 	process.nextTick(() => {
 		return cb(null, {
+			// Change MongoDB ObjectID to string
 			id: user["_id"].toString(),
 			email: user["email"],
 			username: user["username"]

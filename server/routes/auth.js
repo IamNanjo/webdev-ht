@@ -14,8 +14,6 @@ router.get("/register", (req, res) =>
 	res.sendFile(path.join(__dirname, "..", "..", "dist", "index.html"))
 );
 
-// TODO: Make sure emails are unique
-
 router.post(
 	"/register",
 	// Validate request body
@@ -30,9 +28,11 @@ router.post(
 
 		let { email, username, password } = req.body;
 
-		const emailTaken = (await User.find({ email: req.body.email })).length;
-		const usernameTaken = (await User.find({ username: req.body.username }))
-			.length;
+		// Await these calls in parallel
+		const [emailTaken, usernameTaken] = await Promise.all([
+			User.findOne({ email}),
+			User.findOne({ username })
+		]);
 
 		if (emailTaken) {
 			return res.status(409).json({ message: "Email already taken" });
@@ -40,12 +40,15 @@ router.post(
 			return res.status(409).json({ message: "Username already taken" });
 		}
 
+		// Create account, save it to the database and then log the user in
 		bcrypt
 			.hash(password, 10)
 			.then(async (hashedPassword) => {
-				password = hashedPassword;
-
-				const user = new User({ email, username, password });
+				const user = new User({
+					email,
+					username,
+					password: hashedPassword
+				});
 
 				await user.save();
 
@@ -58,19 +61,18 @@ router.post(
 			})
 			.catch((err) => {
 				console.error(err);
-				try {
-					// This might try to modify headers after a response is already sent
-					res.sendStatus(500);
-				} catch {}
+				if (!res.headersSent) res.sendStatus(500);
 			});
 	}
 );
 
+// Login page
 router.get("/login", (req, res, next) => {
 	if (req.isAuthenticated()) return res.redirect("/profile");
 	return res.sendFile(path.join(__dirname, "..", "..", "dist", "index.html"));
 });
 
+// Attempt login
 router.post("/login", (req, res, next) => {
 	passport.authenticate(
 		"local",

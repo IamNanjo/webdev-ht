@@ -59,7 +59,7 @@ router.post("/chats", body("userList").isArray(), async (req, res) => {
 
 	const { userList } = req.body;
 
-	// Make sure all users exist and
+	// Make sure all users exist
 	for (let i = 0; i < userList.length; i++) {
 		if (
 			userList[i] == req.user.id ||
@@ -68,6 +68,7 @@ router.post("/chats", body("userList").isArray(), async (req, res) => {
 			return res.sendStatus(400);
 	}
 
+	// Save the new chat to the database
 	new Chat({ members: [req.user.id, ...userList] }).save((err) => {
 		if (err) {
 			console.error(err);
@@ -76,6 +77,7 @@ router.post("/chats", body("userList").isArray(), async (req, res) => {
 	});
 });
 
+// Delete a chat
 router.delete("/chats", body("id").not().isEmpty().trim(), async (req, res) => {
 	if (!req.isAuthenticated()) return res.sendStatus(401);
 	const errors = validationResult(req);
@@ -95,7 +97,7 @@ router.delete("/chats", body("id").not().isEmpty().trim(), async (req, res) => {
 			if (err) console.error(err);
 			else res.sendStatus(200);
 		});
-	} else {
+	} else { // Else just remove the user from the chat
 		chat.members = chat.members.filter((member) => member != req.user.id);
 
 		chat.save((err) => {
@@ -117,9 +119,11 @@ router.post(
 
 		const { recipient, message } = req.body;
 
+		// Make sure the chat exists
 		let chat = await Chat.findById(recipient);
 		if (chat == null) return res.sendStatus(404);
 
+		// Save message to the database
 		Chat.findByIdAndUpdate(
 			recipient,
 			{

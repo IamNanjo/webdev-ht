@@ -1,7 +1,7 @@
 {
 	"cwd": "server/",
 	"script": "server.js",
-	"watch": ["server/*"],
+	"watch": ["server"],
 	"instances": "max",
 	"exec_mode": "cluster",
 	"watch_options": {
