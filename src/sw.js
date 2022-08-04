@@ -1,3 +1,6 @@
+// Default network-first service worker from Vite plugin PWA docs
+// https://vite-plugin-pwa.netlify.app/workbox/inject-manifest.html#network-first-strategy
+
 import { cacheNames, clientsClaim } from "workbox-core";
 import {
 	registerRoute,

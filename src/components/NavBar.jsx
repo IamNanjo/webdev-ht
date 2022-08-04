@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 
 function NavBar() {
 	const [username, setUsername] = useState("");
+	// (dropdown)isOpen
 	const [isOpen, setIsOpen] = useState(false);
 	const dropdownRef = useRef();
 
@@ -59,6 +60,7 @@ function NavBar() {
 		
 		if (/^\/auth\/logout/i.test(location.pathname)) return logout();
 
+		// Get username for profile button
 		fetch("/api/profile", {
 			method: "GET",
 			mode: "same-origin",
@@ -84,7 +86,7 @@ function NavBar() {
 			cache: "no-cache",
 			credentials: "same-origin"
 		}).then(
-			(res) => {
+			() => {
 				setUsername("");
 				setIsOpen(false);
 				navigate("/auth/login");

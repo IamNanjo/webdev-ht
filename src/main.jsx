@@ -11,6 +11,7 @@ import Login from "./components/Login";
 import Profile from "./components/Profile";
 import ChatView from "./components/ChatView";
 
+// Render NavBar on every page and let the router handle the main content
 ReactDOM.createRoot(document.getElementById("root")).render(
 	<Router>
 		<NavBar />
