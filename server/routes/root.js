@@ -1,4 +1,5 @@
 const path = require("path");
+const bcrypt = require("bcrypt");
 const { body, validationResult } = require("express-validator");
 const router = require("express").Router();
 
@@ -28,11 +29,12 @@ router.get("/messages", async (req, res) => {
 });
 
 // Update account email or username
-// TODO: allow changing password using old password
 router.put(
 	"/profile",
 	body("email").normalizeEmail().isEmail(),
 	body("username").not().isEmpty().trim(),
+	body("currentPassword").isString(),
+	body("newPassword").isString(),
 	async (req, res) => {
 		if (!req.isAuthenticated()) return res.sendStatus(401);
 
@@ -40,12 +42,12 @@ router.put(
 		if (!errors.isEmpty())
 			return res.status(400).json({ errors: errors.array() });
 
-		let { email, username } = req.body;
+		let { email, username, currentPassword, newPassword } = req.body;
 
 		// Await these calls in parallel
-		const [emailTaken, usernameTaken] = Promise.all([
-			await User.findOne({ email }),
-			await User.findOne({ username })
+		const [emailTaken, usernameTaken] = await Promise.all([
+			User.findOne({ email }),
+			User.findOne({ username })
 		]);
 
 		// If email or username is taken by someone other than the user requesting the update
@@ -66,6 +68,17 @@ router.put(
 			user.email = email;
 			user.username = username;
 
+			// Update password
+			if (currentPassword && newPassword) {
+				const match = await bcrypt.compare(currentPassword, user.password);
+
+				if (match) {
+					user.password = await bcrypt.hash(newPassword, 10);
+				} else {
+					return res.status(403).json({ message: "Incorrect password" });
+				}
+			}
+
 			await user.save();
 
 			// Login with the updated user
@@ -78,7 +91,6 @@ router.put(
 );
 
 // Delete account
-// TODO: Make sure all chats are deleted before the user is deleted
 router.delete("/profile", async (req, res) => {
 	if (!req.isAuthenticated()) return res.sendStatus(401);
 
@@ -90,27 +102,16 @@ router.delete("/profile", async (req, res) => {
 
 		// Remove user from chats
 		if (chats.length) {
-			for await (const chat of chats) {
+			for (let i = 0; i < chats.length; i++) {
+				let chat = chats[i];
 				if (chat.members.length > 1) {
-					Chat.findOneAndUpdate(
-						chat,
-						{
-							$pull: { members: req.user.id }
-						},
-						(err) => {
-							if (err) {
-								console.error(err);
-								return res.sendStatus(500);
-							}
-						}
-					);
-				} else {
-					Chat.deleteOne(chat, (err) => {
-						if (err) {
-							console.error(err);
-							return res.sendStatus(500);
-						}
+					console.log("Removing user from chat");
+					await Chat.findByIdAndUpdate(chat._id, {
+						$pull: { members: req.user.id }
 					});
+				} else {
+					console.log("Deleting chat");
+					await Chat.findByIdAndDelete(chat._id);
 				}
 			}
 		}

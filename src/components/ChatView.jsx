@@ -99,17 +99,24 @@ function ChatView() {
 	}, []);
 
 	useEffect(() => {
-		// Scroll to bottom whenever message list changes
-		messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-	}, [messages]);
-
-	useEffect(() => {
 		if (selectedChat) {
 			// Choose the correct chat from the list whenever a new chat is selected or chatList is updated
 			const chat = chatList.filter((chat) => chat._id == selectedChat)[0];
-			// We can just compare the array length because this app does not allow deleting messages
-			if (chat.messages.length != messages.length) {
-				setMessages(chat.messages);
+			if (!messages.length || messages != chat.messages) {
+				// Scroll to bottom unless the user had scrolled far enough away from the bottom
+
+				let rect = messagesEndRef.current?.getBoundingClientRect();
+
+				if (rect.top >= 0 && rect.bottom <= window.innerHeight + 100) {
+					console.log("Scrolling to bottom");
+					messagesEndRef.current?.scrollIntoView({
+						behavior: "smooth"
+					});
+					setMessages(chat.messages);
+				} else {
+					console.log("Not scrolling to bottom");
+					setMessages(chat.messages);
+				}
 			}
 		}
 	}, [selectedChat, chatList]);
@@ -372,7 +379,8 @@ function ChatView() {
 					{chatList.length > 0 &&
 						chatList.map((chat) => {
 							let members = "";
-							if (chat.members.length <= 1) members = "Empty chat";
+							if (chat.members.length <= 1)
+								members = "Empty chat";
 							else {
 								for (let i = 0; i < chat.members.length; i++) {
 									if (chat.members[i]._id == loggedInUser)
@@ -437,8 +445,7 @@ function ChatView() {
 										<div>{msg.content}</div>
 									</li>
 								);
-							}
-							else if (msg.sender._id == loggedInUser) {
+							} else if (msg.sender._id == loggedInUser) {
 								return (
 									<li
 										key={msg._id}
@@ -469,7 +476,7 @@ function ChatView() {
 					<textarea
 						id="messageField"
 						className="form-control"
-						placeholder="Type message here..."
+						placeholder="Type message here...&#10;Press Shift + Enter to send the message"
 						disabled={!selectedChat}
 						value={currentMsg}
 						onInput={(e) => setCurrentMsg(e.target.value)}

@@ -8,6 +8,8 @@ function Profile() {
 		email: "",
 		username: ""
 	});
+	const [currentPassword, setCurrentPassword] = useState("");
+	const [newPassword, setNewPassword] = useState("");
 	const [statusMsg, setStatusMsg] = useState("");
 	const [updated, setUpdated] = useState(false);
 
@@ -39,7 +41,7 @@ function Profile() {
 
 	useEffect(() => {
 		getProfile();
-	}, []); // Empty dependency array will stop useEffect from running after every update
+	}, []); // Empty dependency array: run only once
 
 	const updateEmail = (e) =>
 		setUserProfile({
@@ -52,6 +54,9 @@ function Profile() {
 			username: e.target.value
 		});
 
+	const updateCurrentPassword = (e) => setCurrentPassword(e.target.value);
+	const updateNewPassword = (e) => setNewPassword(e.target.value);
+
 	function handleSubmit(e) {
 		e.preventDefault();
 
@@ -63,7 +68,11 @@ function Profile() {
 			headers: {
 				"Content-Type": "application/json"
 			},
-			body: JSON.stringify(userProfile)
+			body: JSON.stringify({
+				...userProfile,
+				currentPassword,
+				newPassword
+			})
 		}).then(
 			async (res) => {
 				if (res.status == 200) {
@@ -176,6 +185,50 @@ function Profile() {
 							required
 							autoFocus
 							onInput={updateUsername}
+						/>
+					</div>
+				</div>
+
+				<h3 className="text-center my-3">Change password</h3>
+
+				<div className="form-group">
+					<label htmlFor="current-password">Current password</label>
+					<div className="input-group">
+						<div className="input-group-prepend">
+							<span className="input-group-text material-symbols-rounded">
+								lock
+							</span>
+						</div>
+						<input
+							id="current-password"
+							className="form-control"
+							name="current-password"
+							type="password"
+							autoComplete="current-password"
+							placeholder="••••••"
+							required
+							onInput={updateCurrentPassword}
+						/>
+					</div>
+				</div>
+
+				<div className="form-group">
+					<label htmlFor="new-password">New password</label>
+					<div className="input-group">
+						<div className="input-group-prepend">
+							<span className="input-group-text material-symbols-rounded">
+								lock
+							</span>
+						</div>
+						<input
+							id="new-password"
+							className="form-control"
+							name="new-password"
+							type="password"
+							autoComplete="new-password"
+							placeholder="••••••"
+							required
+							onInput={updateNewPassword}
 						/>
 					</div>
 				</div>
