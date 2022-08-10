@@ -67,7 +67,7 @@ function ChatView() {
 	useEffect(() => {
 		document.title = "WhatUpp";
 
-		// Get logged in user's id and 
+		// Get logged in user's id and fetch messages
 		fetch("/api/profile", {
 			method: "GET",
 			mode: "same-origin",
