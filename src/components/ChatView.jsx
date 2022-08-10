@@ -63,9 +63,11 @@ function ChatView() {
 		);
 	};
 
+	// Run when mounted
 	useEffect(() => {
 		document.title = "WhatUpp";
 
+		// Get logged in user's id and 
 		fetch("/api/profile", {
 			method: "GET",
 			mode: "same-origin",
@@ -104,10 +106,9 @@ function ChatView() {
 			// Choose the correct chat from the list whenever a new chat is selected or chatList is updated
 			const chat = chatList.filter((chat) => chat._id == selectedChat)[0];
 			if (!messages.length || messages != chat.messages) {
-				// Scroll to bottom unless the user had scrolled far enough away from the bottom
-
 				let rect = messagesEndRef.current?.getBoundingClientRect();
-
+				
+				// Scroll to bottom unless the user had scrolled far enough away from the bottom
 				if (rect.top >= 0 && rect.bottom <= window.innerHeight + 100) {
 					console.log("Scrolling to bottom");
 					messagesEndRef.current?.scrollIntoView({
@@ -122,6 +123,7 @@ function ChatView() {
 		}
 	}, [selectedChat, chatList]);
 
+	// Create a new chat with the selected users
 	const createChat = (e) => {
 		fetch("/api/chats", {
 			method: "POST",
@@ -144,6 +146,7 @@ function ChatView() {
 		);
 	};
 
+	// Delete a chat
 	const deleteChat = (confirmed = false) => {
 		if (!confirmed) return;
 
@@ -188,6 +191,7 @@ function ChatView() {
 		e.currentTarget.classList.add("active");
 	};
 
+	// Search users for a new chat
 	const searchUsers = (e) => {
 		const val = e.target.value;
 
@@ -210,11 +214,20 @@ function ChatView() {
 		);
 	};
 
+	// Select users when clicked
 	const toggleUser = (e, id) => {
 		if (selectedUsers.includes(id)) {
 			setSelectedUsers(selectedUsers.filter((user) => user != id));
 		} else {
 			setSelectedUsers([...selectedUsers, id]);
+		}
+	};
+
+	// Send messages using Enter and create linebreaks with Shift + Enter
+	const handleMessageKeydown = (e) => {
+		if (!e.shiftKey && e.key == "Enter") {
+			e.preventDefault();
+			sendMessage(e);
 		}
 	};
 
@@ -231,14 +244,13 @@ function ChatView() {
 					role="dialog"
 				>
 					<div
-						class="modal-dialog modal-dialog-centered"
+						className="modal-dialog modal-dialog-centered"
 						role="document"
 					>
-						<div class="modal-content border border-secondary">
-							<div class="modal-header">
+						<div className="modal-content border border-secondary">
+							<div className="modal-header">
 								<h5
-									id="exampleModalLongTitle"
-									class="modal-title"
+									className="modal-title noselect"
 								>
 									Are you sure you want to delete this chat?
 								</h5>
@@ -252,17 +264,17 @@ function ChatView() {
 									close
 								</span>
 							</div>
-							<div class="d-flex justify-content-around modal-body">
+							<div className="d-flex justify-content-around modal-body">
 								<button
 									type="button"
-									class="btn btn-secondary"
+									className="btn btn-secondary"
 									onClick={(e) => setDeleteConfirmation("")}
 								>
 									Cancel
 								</button>
 								<button
 									type="button"
-									class="btn btn-danger"
+									className="btn btn-danger"
 									onClick={(e) => {
 										deleteChat(true);
 									}}
@@ -287,14 +299,13 @@ function ChatView() {
 					role="dialog"
 				>
 					<div
-						class="modal-dialog modal-lg modal-dialog-centered"
+						className="modal-dialog modal-lg modal-dialog-centered"
 						role="document"
 					>
-						<div class="modal-content border border-secondary">
-							<div class="modal-header">
+						<div className="modal-content border border-secondary">
+							<div className="modal-header">
 								<h5
-									id="exampleModalLongTitle"
-									class="modal-title noselect"
+									className="modal-title noselect"
 								>
 									Select users
 								</h5>
@@ -311,7 +322,7 @@ function ChatView() {
 									close
 								</span>
 							</div>
-							<div class="modal-body">
+							<div className="modal-body">
 								<input
 									className="form-control mb-2"
 									type="text"
@@ -340,10 +351,10 @@ function ChatView() {
 										))}
 								</ul>
 							</div>
-							<div class="modal-footer">
+							<div className="modal-footer">
 								<button
 									type="button"
-									class="btn btn-secondary"
+									className="btn btn-secondary"
 									onClick={(e) => {
 										setUserSearchIsOpen(false);
 										setSelectedUsers([]);
@@ -353,7 +364,7 @@ function ChatView() {
 								</button>
 								<button
 									type="button"
-									class="btn btn-primary"
+									className="btn btn-primary"
 									disabled={selectedUsers.length < 1}
 									onClick={(e) => createChat()}
 								>
@@ -479,13 +490,9 @@ function ChatView() {
 						className="form-control"
 						disabled={!selectedChat}
 						value={currentMsg}
+						placeholder="Type message here..."
 						onInput={(e) => setCurrentMsg(e.target.value)}
-						onKeyDown={(e) => {
-							if (!e.shiftKey && e.key == "Enter") {
-								e.preventDefault();
-								sendMessage(e);
-							}
-						}}
+						onKeyDown={handleMessageKeydown}
 					></textarea>
 					<button
 						className="btn btn-primary rounded-circle"
