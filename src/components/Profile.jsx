@@ -248,7 +248,7 @@ function Profile() {
 						</motion.div>
 					)}
 				</AnimatePresence>
-				<div className="d-flex justify-content-between mx-auto mt-4">
+				<div className="d-flex justify-content-around mx-auto mt-4">
 					<button className="d-block btn btn-primary" type="submit">
 						Update
 					</button>
