@@ -6,7 +6,7 @@
     - [Create account](https://webdev-ht.nanjo.tech/auth/register)
     - [Login](https://webdev-ht.nanjo.tech/auth/login)
     - [Messages](https://webdev-ht.nanjo.tech/messages)
-- [Documentation](https://webdev-ht.nanjo.tech/documentation)
+- [Documentation](https://webdev-ht.nanjo.tech/documentation) (Finnish)
 
 ## Repository files and folders
 
@@ -21,7 +21,7 @@
 - `pm2-process.json`
     - config file for pm2 (process manager 2)
         - cluster mode allows multiple nodejs instances to run at the same time to increase performance
-        - will automatically restart whenever it crashes or when the server files are modified
+        - will automatically restart whenever it crashes
 
 - `index.html`
     - Template for app pages
