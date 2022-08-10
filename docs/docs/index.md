@@ -1,5 +1,7 @@
 # WhatUpp
 
+Viimeksi päivitetty: 11.8.2022
+
 ## Yleiskatsaus
 
 Harjoitustyö kursseille web-ohjelmointi TTMS0500-3007 ja web-palvelinohjelmointi TTMS0900-3007.
