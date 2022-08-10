@@ -5,7 +5,6 @@ site_description: Tietokannat harjoitustyön dokumentaatio
 
 theme:
   name: material
-  locale: fi
   palette:
     scheme: slate
     primary: red

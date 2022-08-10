@@ -1,17 +1,31 @@
-# Welcome to MkDocs
+# WhatUpp
 
-For full documentation visit [mkdocs.org](https://www.mkdocs.org).
+## Yleiskatsaus
 
-## Commands
+Harjoitustyö kursseille web-ohjelmointi TTMS0500-3007 ja web-palvelinohjelmointi TTMS0900-3007.
 
-* `mkdocs new [dir-name]` - Create a new project.
-* `mkdocs serve` - Start the live-reloading docs server.
-* `mkdocs build` - Build the documentation site.
-* `mkdocs -h` - Print help message and exit.
+Harjoitustyön tekijä on Arttu Kaipainen, sen aiheena on WhatUpp full-stack viestintäsovellus ja siinä on käytetty MERN-stackiä eli:
 
-## Project layout
+- MongoDB
+- ExpressJS
+- React
+- NodeJS
 
-    mkdocs.yml    # The configuration file.
-    docs/
-        index.md  # The documentation homepage.
-        ...       # Other markdown pages, images and other files.
+Sivun yläreunassa on linkki GitHub repositorioon, josta löytyy kaikki harjoitustyön lähdekoodit.
+
+Repositorion README.md tiedostossa on selitetty kansiorakenne.
+
+Kokeiluympäristö löytyy [täältä](https://webdev-ht.nanjo.tech/)
+
+## Itsearviointi
+
+Olen erittäin tyytyväinen harjoitustyöhön ja siitä tuli juuri sellainen kuin halusin.
+
+Työn laajuuden takia ehdotan arvosanaa 5
+
+Ajan käyttö:
+
+-   Back-end n. 25 tuntia
+-   Front-end n. 30 tuntia
+-   Dokumentaatio n. x tuntia
+-   Yht. 60 tuntia
