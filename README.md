@@ -26,7 +26,7 @@
 - `index.html`
     - Template for app pages
 
-- `server/`
+- `server/` (back-end files)
     - `models`
         - Mongoose (MongoDB) document models
     - `routes`
