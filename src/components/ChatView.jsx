@@ -84,6 +84,7 @@ function ChatView() {
 		);
 
 		// Background updates for messages
+		// Every 1 second for web workers and every 2.5 seconds for normal setInterval
 		if (typeof Worker !== "undefined") {
 			const worker = new Worker("/background-updates.js", {
 				credentials: "same-origin"
@@ -476,12 +477,14 @@ function ChatView() {
 					<textarea
 						id="messageField"
 						className="form-control"
-						placeholder="Type message here...&#10;Press Shift + Enter to send the message"
 						disabled={!selectedChat}
 						value={currentMsg}
 						onInput={(e) => setCurrentMsg(e.target.value)}
 						onKeyDown={(e) => {
-							if (e.shiftKey && e.key == "Enter") sendMessage(e);
+							if (!e.shiftKey && e.key == "Enter") {
+								e.preventDefault();
+								sendMessage(e);
+							}
 						}}
 					></textarea>
 					<button
