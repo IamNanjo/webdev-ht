@@ -20,4 +20,4 @@ const getMessages = () => {
 
 setInterval(() => {
 	getMessages();
-}, 2500);
+}, 1000);
