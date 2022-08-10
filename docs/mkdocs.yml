@@ -1,6 +1,6 @@
 site_name: Web-ohjelmointi ja web-palvelinohjelmointi harjoitustyö
-site_url: https://database-ht.nanjo.tech/documentation
-repo_url: https://gitlab.labranet.jamk.fi/AB6262/webdev-ht
+site_url: https://webdev-ht.nanjo.tech/documentation
+repo_url: https://github.com/IamNanjo/webdev-ht
 site_description: Tietokannat harjoitustyön dokumentaatio
 
 theme:
