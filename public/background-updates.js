@@ -1,3 +1,4 @@
+// Fetch messages and send them to the ChatView
 const getMessages = () => {
 	return fetch("/api/chats", {
 		method: "GET",
