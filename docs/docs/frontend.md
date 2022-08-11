@@ -6,7 +6,7 @@ Päätin käyttää hyvin yksinkertaista sivupalkkia, jossa on keskustelut ja is
 jossa itse lähetetyt viestit ovat tasattuna oikeaan reunaan ja muiden lähettämät viestit ovat tasattu vasempaan reunaan
 Navigointipalkkikin on hyvin minimaalinen, koska tässä sovelluksessa on vain yksi sivu profiilin, kirjautumisen ja käyttäjän luomisen lisäksi.
 
-## Käytetyt kirjastot:
+## Projektissa käytetyt kirjastot
 
 -   vite
 -   vite-plugin-pwa

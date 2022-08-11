@@ -1,6 +1,6 @@
 # Back-end
 
-## Käytetyt kirjastot:
+## Projektissa käytetyt kirjastot
 
 - https (NodeJS)
 - path (NodeJS)
