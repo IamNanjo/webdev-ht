@@ -4,10 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 
 function Profile() {
 	const [header, setHeader] = useState("Profile");
-	const [userProfile, setUserProfile] = useState({
-		email: "",
-		username: ""
-	});
+	const [username, setUsername] = useState("");
 	const [currentPassword, setCurrentPassword] = useState("");
 	const [newPassword, setNewPassword] = useState("");
 	const [statusMsg, setStatusMsg] = useState("");
@@ -26,7 +23,7 @@ function Profile() {
 			async (res) => {
 				if (res.status == 200) {
 					const data = await res.json();
-					setUserProfile(data);
+					setUserProfile(data.username);
 					setHeader(`${data.username}'s profile`);
 					document.title = `${data.username}'s profile | WhatUpp`;
 				} else {
@@ -43,17 +40,7 @@ function Profile() {
 		getProfile();
 	}, []); // Empty dependency array: run only once
 
-	const updateEmail = (e) =>
-		setUserProfile({
-			email: e.target.value,
-			username: userProfile.username
-		});
-	const updateUsername = (e) =>
-		setUserProfile({
-			email: userProfile.email,
-			username: e.target.value
-		});
-
+	const updateUsername = (e) => setUserProfile(e.target.value);
 	const updateCurrentPassword = (e) => setCurrentPassword(e.target.value);
 	const updateNewPassword = (e) => setNewPassword(e.target.value);
 
@@ -69,7 +56,7 @@ function Profile() {
 				"Content-Type": "application/json"
 			},
 			body: JSON.stringify({
-				...userProfile,
+				...userName,
 				currentPassword,
 				newPassword
 			})
@@ -98,7 +85,7 @@ function Profile() {
 		e.preventDefault();
 
 		const confirmation = confirm(
-			`Are you sure you want to delete your account? (${userProfile.username})`
+			`Are you sure you want to delete your account? (${userName.username})`
 		);
 		if (!confirmation) return;
 
@@ -145,29 +132,6 @@ function Profile() {
 			<h1 className="text-center my-3">{header}</h1>
 			<form method="post" className="mx-auto" onSubmit={handleSubmit}>
 				<div className="form-group">
-					<label htmlFor="email">Email</label>
-					<div className="input-group">
-						<div className="input-group-prepend">
-							<span className="input-group-text material-symbols-rounded">
-								alternate_email
-							</span>
-						</div>
-
-						<input
-							id="email"
-							className="form-control"
-							name="email"
-							type="email"
-							value={userProfile.email}
-							autoComplete="email"
-							required
-							autoFocus
-							onInput={updateEmail}
-						/>
-					</div>
-				</div>
-
-				<div className="form-group">
 					<label htmlFor="username">Username</label>
 					<div className="input-group">
 						<div className="input-group-prepend">
@@ -180,7 +144,7 @@ function Profile() {
 							className="form-control"
 							name="username"
 							type="text"
-							value={userProfile.username}
+							value={userName.username}
 							autoComplete="username"
 							required
 							autoFocus

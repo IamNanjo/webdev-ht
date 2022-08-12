@@ -7,7 +7,6 @@ function Register() {
 		document.title = "Create account | WhatUpp";
 	});
 
-	const [email, setEmail] = useState("");
 	const [username, setUsername] = useState("");
 	const [password, setPassword] = useState("");
 	const [passwordConfirm, setPasswordConfirm] = useState("");
@@ -18,7 +17,6 @@ function Register() {
 	const [passwordHasNumbers, setPasswordHasNumbers] = useState(false);
 	const [passwordHasSymbols, setPasswordHasSymbols] = useState(false);
 
-	const updateEmail = (e) => setEmail(e.target.value);
 	const updateUsername = (e) => setUsername(e.target.value);
 	const updatePassword = (e) => {
 		setPassword(e.target.value);
@@ -48,7 +46,6 @@ function Register() {
 				"Content-Type": "application/json"
 			},
 			body: JSON.stringify({
-				email,
 				username,
 				password
 			})
@@ -68,28 +65,6 @@ function Register() {
 		<main className="container">
 			<h1 className="text-center my-3">Create account</h1>
 			<form method="post" className="mx-auto" onSubmit={handleSubmit}>
-				<div className="form-group">
-					<label htmlFor="email">Email</label>
-					<div className="input-group">
-						<div className="input-group-prepend">
-							<span className="input-group-text material-symbols-rounded">
-								alternate_email
-							</span>
-						</div>
-
-						<input
-							id="email"
-							className="form-control"
-							name="email"
-							type="email"
-							autoComplete="email"
-							placeholder="email@example.com"
-							required
-							autoFocus
-							onInput={updateEmail}
-						/>
-					</div>
-				</div>
 				<div className="form-group">
 					<label htmlFor="username">Username</label>
 					<div className="input-group">

@@ -17,7 +17,6 @@ router.get("/register", (req, res) =>
 router.post(
 	"/register",
 	// Validate request body
-	body("email").normalizeEmail().isEmail(),
 	body("username").not().isEmpty().trim(),
 	body("password").isLength({ min: 6 }).trim(),
 	async (req, res, next) => {
@@ -26,17 +25,12 @@ router.post(
 		if (!errors.isEmpty())
 			return res.status(400).json({ errors: errors.array() });
 
-		let { email, username, password } = req.body;
+		let { username, password } = req.body;
 
-		// Await these calls in parallel
-		const [emailTaken, usernameTaken] = await Promise.all([
-			User.findOne({ email}),
-			User.findOne({ username })
-		]);
+		// Null or object
+		const usernameTaken = await User.findOne({ username });
 
-		if (emailTaken) {
-			return res.status(409).json({ message: "Email already taken" });
-		} else if (usernameTaken) {
+		if (usernameTaken) {
 			return res.status(409).json({ message: "Username already taken" });
 		}
 
@@ -45,7 +39,6 @@ router.post(
 			.hash(password, 10)
 			.then(async (hashedPassword) => {
 				const user = new User({
-					email,
 					username,
 					password: hashedPassword
 				});

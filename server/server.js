@@ -69,14 +69,13 @@ passport.use(
 );
 
 // This is where we choose what we save in cookies
-// In this app we only need the user ID, email and username
+// In this app we only need the user ID and username
 // This app could also work with just the ID but this way we don't need as many database queries
 passport.serializeUser((user, cb) => {
 	process.nextTick(() => {
 		return cb(null, {
 			// Change MongoDB ObjectID to string
 			id: user["_id"].toString(),
-			email: user["email"],
 			username: user["username"]
 		});
 	});

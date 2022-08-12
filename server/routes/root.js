@@ -28,10 +28,9 @@ router.get("/messages", async (req, res) => {
 	res.sendFile(path.join(__dirname, "..", "..", "dist", "index.html"));
 });
 
-// Update account email or username
+// Change username or password
 router.put(
 	"/profile",
-	body("email").normalizeEmail().isEmail(),
 	body("username").not().isEmpty().trim(),
 	body("currentPassword").isString(),
 	body("newPassword").isString(),
@@ -42,40 +41,38 @@ router.put(
 		if (!errors.isEmpty())
 			return res.status(400).json({ errors: errors.array() });
 
-		let { email, username, currentPassword, newPassword } = req.body;
+		let { username, currentPassword, newPassword } = req.body;
 
-		// Await these calls in parallel
-		const [emailTaken, usernameTaken] = await Promise.all([
-			User.findOne({ email }),
-			User.findOne({ username })
-		]);
+		// Null or object
+		const usernameTaken = User.findOne({ username });
 
-		// If email or username is taken by someone other than the user requesting the update
-		if (emailTaken && emailTaken._id != req.user.id) {
-			return res.status(409).json({ message: "Email already taken" });
-		}
+		// If username is taken by someone other than the user requesting the update
 		if (usernameTaken && usernameTaken._id != req.user.id) {
 			return res.status(409).json({ message: "Username already taken" });
 		}
 
-		// Get user from the database and update email and username
+		// Get user from the database and update username and password
 		User.findById(req.user.id, async (err, user) => {
 			if (err) {
 				console.error(err);
 				return res.sendStatus(500);
 			}
 
-			user.email = email;
 			user.username = username;
 
 			// Update password
 			if (currentPassword && newPassword) {
-				const match = await bcrypt.compare(currentPassword, user.password);
+				const match = await bcrypt.compare(
+					currentPassword,
+					user.password
+				);
 
 				if (match) {
 					user.password = await bcrypt.hash(newPassword, 10);
 				} else {
-					return res.status(403).json({ message: "Incorrect password" });
+					return res
+						.status(403)
+						.json({ message: "Incorrect password" });
 				}
 			}
 
