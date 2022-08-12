@@ -1,20 +1,29 @@
 site_name: Web-ohjelmointi ja web-palvelinohjelmointi harjoitustyö
+site_author: Arttu Kaipainen
+site_description: Tietokannat harjoitustyön dokumentaatio
 site_url: https://webdev-ht.nanjo.tech/documentation
 repo_url: https://github.com/IamNanjo/webdev-ht
-site_description: Tietokannat harjoitustyön dokumentaatio
+edit_uri: blob/main/docs/docs/
 
 theme:
-  name: material
-  palette:
-    scheme: slate
-    primary: red
-  font:
-    text: Roboto
-    code: Roboto Mono
-  features:
-    - navigation.sections
-    - navigation.top
+    name: material
+    palette:
+        scheme: slate
+        primary: red
+    font:
+        text: Roboto
+        code: Roboto Mono
+    features:
+        - navigation.sections
+        - navigation.top
 
 site_dir: ../documentation
 extra_css:
-  - styles/smooth-scrolling.css
+    - styles/smooth-scrolling.css
+
+markdown_extensions:
+    - pymdownx.highlight:
+          anchor_linenums: true
+    - pymdownx.inlinehilite
+    - pymdownx.snippets
+    - pymdownx.superfences
