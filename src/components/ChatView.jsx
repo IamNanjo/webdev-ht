@@ -107,16 +107,14 @@ function ChatView() {
 			const chat = chatList.filter((chat) => chat._id == selectedChat)[0];
 			if (!messages.length || messages != chat.messages) {
 				let rect = messagesEndRef.current?.getBoundingClientRect();
-				
+
 				// Scroll to bottom unless the user had scrolled far enough away from the bottom
 				if (rect.top >= 0 && rect.bottom <= window.innerHeight + 100) {
-					console.log("Scrolling to bottom");
 					messagesEndRef.current?.scrollIntoView({
 						behavior: "smooth"
 					});
 					setMessages(chat.messages);
 				} else {
-					console.log("Not scrolling to bottom");
 					setMessages(chat.messages);
 				}
 			}
@@ -249,9 +247,7 @@ function ChatView() {
 					>
 						<div className="modal-content border border-secondary">
 							<div className="modal-header">
-								<h5
-									className="modal-title noselect"
-								>
+								<h5 className="modal-title noselect">
 									Are you sure you want to delete this chat?
 								</h5>
 								<span
@@ -304,9 +300,7 @@ function ChatView() {
 					>
 						<div className="modal-content border border-secondary">
 							<div className="modal-header">
-								<h5
-									className="modal-title noselect"
-								>
+								<h5 className="modal-title noselect">
 									Select users
 								</h5>
 								<span

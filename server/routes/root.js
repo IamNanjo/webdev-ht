@@ -44,7 +44,7 @@ router.put(
 		let { username, currentPassword, newPassword } = req.body;
 
 		// Null or object
-		const usernameTaken = User.findOne({ username });
+		const usernameTaken = await User.findOne({ username });
 
 		// If username is taken by someone other than the user requesting the update
 		if (usernameTaken && usernameTaken._id != req.user.id) {

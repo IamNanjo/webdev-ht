@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 
 function Profile() {
@@ -10,7 +10,6 @@ function Profile() {
 	const [statusMsg, setStatusMsg] = useState("");
 	const [updated, setUpdated] = useState(false);
 
-	const location = useLocation().pathname;
 	const navigate = useNavigate();
 
 	const getProfile = () =>
@@ -23,7 +22,7 @@ function Profile() {
 			async (res) => {
 				if (res.status == 200) {
 					const data = await res.json();
-					setUserProfile(data.username);
+					setUsername(data.username);
 					setHeader(`${data.username}'s profile`);
 					document.title = `${data.username}'s profile | WhatUpp`;
 				} else {
@@ -40,14 +39,14 @@ function Profile() {
 		getProfile();
 	}, []); // Empty dependency array: run only once
 
-	const updateUsername = (e) => setUserProfile(e.target.value);
+	const updateUsername = (e) => setUsername(e.target.value);
 	const updateCurrentPassword = (e) => setCurrentPassword(e.target.value);
 	const updateNewPassword = (e) => setNewPassword(e.target.value);
 
 	function handleSubmit(e) {
 		e.preventDefault();
 
-		fetch(location, {
+		fetch("/profile", {
 			method: "PUT",
 			mode: "same-origin",
 			cache: "no-cache",
@@ -56,7 +55,7 @@ function Profile() {
 				"Content-Type": "application/json"
 			},
 			body: JSON.stringify({
-				...userName,
+				username,
 				currentPassword,
 				newPassword
 			})
@@ -89,7 +88,7 @@ function Profile() {
 		);
 		if (!confirmation) return;
 
-		fetch(location, {
+		fetch("/profile", {
 			method: "DELETE",
 			mode: "same-origin",
 			cache: "no-cache",
@@ -144,7 +143,7 @@ function Profile() {
 							className="form-control"
 							name="username"
 							type="text"
-							value={userName.username}
+							value={username}
 							autoComplete="username"
 							required
 							autoFocus
@@ -170,7 +169,6 @@ function Profile() {
 							type="password"
 							autoComplete="current-password"
 							placeholder="••••••"
-							required
 							onInput={updateCurrentPassword}
 						/>
 					</div>
@@ -191,7 +189,6 @@ function Profile() {
 							type="password"
 							autoComplete="new-password"
 							placeholder="••••••"
-							required
 							onInput={updateNewPassword}
 						/>
 					</div>
