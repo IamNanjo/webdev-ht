@@ -1,5 +1,5 @@
 // Fetch messages and send them to the ChatView
-const getMessages = () => {
+const getMessages = (interval) => {
 	return fetch("/api/chats", {
 		method: "GET",
 		mode: "same-origin",
@@ -10,15 +10,22 @@ const getMessages = () => {
 		}
 	}).then(
 		async (res) => {
-			const data = await res.json();
-
-			if (res.status != 200) postMessage({ error: data.message });
-			else postMessage({ chatList: data.chatList });
+			// Close web worker if not logged in
+			// Otherwise it will keep making requests unnecessary requests
+			if (res.status == 401) {
+				close();
+			} else if (res.status != 200) {
+				const data = await res.json();
+				postMessage({ error: data.message });
+			} else {
+				const data = await res.json();
+				postMessage({ chatList: data.chatList });
+			}
 		},
 		(err) => console.error(err)
 	);
 };
 
-setInterval(() => {
-	getMessages();
+const interval = setInterval(() => {
+	getMessages(interval);
 }, 1000);
