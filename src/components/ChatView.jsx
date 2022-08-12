@@ -103,23 +103,22 @@ function ChatView() {
 
 	useEffect(() => {
 		if (selectedChat) {
-			// Choose the correct chat from the list whenever a new chat is selected or chatList is updated
+			// Choose the correct chat from the list whenever a new chat is selected or the chatList is updated
+			// Only update messages array if the current one is empty or it's different from the current one
 			const chat = chatList.filter((chat) => chat._id == selectedChat)[0];
-			if (!messages.length || messages != chat.messages) {
-				let rect = messagesEndRef.current?.getBoundingClientRect();
-
-				// Scroll to bottom unless the user had scrolled far enough away from the bottom
-				if (rect.top >= 0 && rect.bottom <= window.innerHeight + 100) {
-					messagesEndRef.current?.scrollIntoView({
-						behavior: "smooth"
-					});
-					setMessages(chat.messages);
-				} else {
-					setMessages(chat.messages);
-				}
+			if (
+				!messages.length ||
+				messages.slice(-1)[0]._id != chat.messages.slice(-1)[0]._id
+			) {
+				setMessages(chat.messages);
 			}
 		}
 	}, [selectedChat, chatList]);
+
+	useEffect(() => {
+		// Scroll to bottom whenever there's a new message or when messages are first loaded
+		messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+	}, [messages]);
 
 	// Create a new chat with the selected users
 	const createChat = (e) => {
@@ -135,7 +134,7 @@ function ChatView() {
 				userList: selectedUsers
 			})
 		}).then(
-			(res) => {
+			() => {
 				setUserSearchIsOpen(false);
 				setSelectedUsers([]);
 				getMessages();
@@ -440,7 +439,20 @@ function ChatView() {
 				<ul id="messageList">
 					{messages.length > 0 &&
 						messages.map((msg) => {
-							// If the msg.sender is null, that means the user has been deleted
+							// msg["createdOn"] is a string
+							let date = new Date(msg["createdOn"]);
+
+							// If msg.sender is null, that means the user has been deleted
+							const createdOn = (
+								<div
+									className={`${
+										msg.sender == null ||
+										msg.sender._id != loggedInUser
+											? "text-muted"
+											: "text-dark"
+									} text-right w-100 mt-2`}
+								>{`${date.getDate()}.${date.getMonth()}.${date.getFullYear()} ${date.getHours()}.${date.getMinutes()}`}</div>
+							);
 							if (msg.sender == null) {
 								return (
 									<li
@@ -449,6 +461,7 @@ function ChatView() {
 									>
 										<h2>Deleted user</h2>
 										<div>{msg.content}</div>
+										{createdOn}
 									</li>
 								);
 							} else if (msg.sender._id == loggedInUser) {
@@ -458,6 +471,7 @@ function ChatView() {
 										className="message rounded border float-right"
 									>
 										<div>{msg.content}</div>
+										{createdOn}
 									</li>
 								);
 							} else {
@@ -468,6 +482,7 @@ function ChatView() {
 									>
 										<h2>{msg.sender.username}</h2>
 										<div>{msg.content}</div>
+										{createdOn}
 									</li>
 								);
 							}
