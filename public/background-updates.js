@@ -1,5 +1,5 @@
 // Fetch messages and send them to the ChatView
-const getMessages = (interval) => {
+const getMessages = () => {
 	return fetch("/api/chats", {
 		method: "GET",
 		mode: "same-origin",
@@ -26,6 +26,6 @@ const getMessages = (interval) => {
 	);
 };
 
-const interval = setInterval(() => {
-	getMessages(interval);
+setInterval(() => {
+	getMessages();
 }, 1000);

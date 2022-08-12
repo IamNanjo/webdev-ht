@@ -77,5 +77,5 @@ Ajan käyttö:
 
 -   Back-end n. 25 tuntia
 -   Front-end n. 30 tuntia
--   Dokumentaatio n. x tuntia
+-   Dokumentaatio n. 5 tuntia
 -   Yht. 60 tuntia
