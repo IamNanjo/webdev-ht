@@ -17,6 +17,8 @@ router.get(
 	"/users",
 	body("searchWord").not().isEmpty().trim(),
 	async (req, res) => {
+		if (!req.isAuthenticated()) return res.sendStatus(401);
+
 		const { searchWord } = req.query;
 		User.find(
 			{
@@ -97,7 +99,8 @@ router.delete("/chats", body("id").not().isEmpty().trim(), async (req, res) => {
 			if (err) console.error(err);
 			else res.sendStatus(200);
 		});
-	} else { // Else just remove the user from the chat
+	} else {
+		// Else just remove the user from the chat
 		chat.members = chat.members.filter((member) => member != req.user.id);
 
 		chat.save((err) => {
