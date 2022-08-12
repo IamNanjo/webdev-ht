@@ -84,7 +84,7 @@ function Profile() {
 		e.preventDefault();
 
 		const confirmation = confirm(
-			`Are you sure you want to delete your account? (${userName.username})`
+			`Are you sure you want to delete your account? (${username})`
 		);
 		if (!confirmation) return;
 
