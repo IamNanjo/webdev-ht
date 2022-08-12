@@ -20,6 +20,8 @@ Sen toteutukseen on käytetty MERN-stackiä eli:
 Sivun yläreunassa on linkki GitHub repositorioon, josta löytyy kaikki harjoitustyön lähdekoodit.
 Sieltä voi myös ladata kaiken lähdekoodin zip-tiedostona ja käyttää ohjelmaa vapaasti miten vain haluaa. ([Unlicense](https://unlicense.org/) lisenssi)
 
+[Zip-tiedoston suora latauslinkki](https://github.com/IamNanjo/webdev-ht/archive/refs/heads/main.zip)
+
 ![Zip-tiedoston lataus](assets/github-zip-download.png)
 
 Vaikka koodin muuttujat ja funktiot on hyvin nimetty ja koodi on kommentoitu, selitän tärkeimpien funktioiden ja reittien toimintaa dokumentaation Back-end ja Front-end osioissa.
