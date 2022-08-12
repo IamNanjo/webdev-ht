@@ -3,16 +3,16 @@ const passport = require("passport");
 const bcrypt = require("bcrypt");
 const { body, validationResult } = require("express-validator");
 
-const mongoose = require("mongoose");
 const User = require("../models/User");
 
 const router = require("express").Router();
 
 router.use((req, res, next) => next());
 
-router.get("/register", (req, res) =>
-	res.sendFile(path.join(__dirname, "..", "..", "dist", "index.html"))
-);
+router.get("/register", (req, res) => {
+	if (req.isAuthenticated()) return res.redirect("/messages");
+	res.sendFile(path.join(__dirname, "..", "..", "dist", "index.html"));
+});
 
 router.post(
 	"/register",
@@ -49,7 +49,7 @@ router.post(
 					if (err) {
 						console.error(err);
 						return next(err);
-					} else return res.redirect("/profile");
+					} else return res.redirect("/messages");
 				});
 			})
 			.catch((err) => {
@@ -61,7 +61,7 @@ router.post(
 
 // Login page
 router.get("/login", (req, res, next) => {
-	if (req.isAuthenticated()) return res.redirect("/profile");
+	if (req.isAuthenticated()) return res.redirect("/messages");
 	return res.sendFile(path.join(__dirname, "..", "..", "dist", "index.html"));
 });
 
@@ -77,7 +77,7 @@ router.post("/login", (req, res, next) => {
 
 			req.login(user, (err) => {
 				if (err) console.error(err);
-				return res.redirect("/profile");
+				return res.redirect("/messages");
 			});
 		}
 	)(req, res, next);
@@ -89,7 +89,7 @@ router.all("/logout", (req, res) => {
 
 	req.logout((err) => {
 		if (err) console.error(err);
-		res.redirect("/profile");
+		res.redirect("/auth/login");
 	});
 });
 

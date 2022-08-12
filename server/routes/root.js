@@ -9,9 +9,8 @@ const User = require("../models/User");
 router.use((req, res, next) => next());
 
 router.get("/", async (req, res) => {
-	if (!req.isAuthenticated()) return res.redirect("/auth/login");
-
-	res.sendFile(path.join(__dirname, "..", "..", "dist", "index.html"));
+	if (!req.isAuthenticated()) res.redirect("/auth/login");
+	else res.redirect("/messages");
 });
 
 // Profile page
@@ -115,8 +114,12 @@ router.delete("/profile", async (req, res) => {
 
 		const success = await User.findByIdAndDelete(req.user.id);
 
-		if (success) res.sendStatus(200);
-		else res.sendStatus(500);
+		if (success) {
+			req.logout((err) => {
+				if (err) return res.sendStatus(500);
+				res.sendStatus(200);
+			});
+		} else res.sendStatus(500);
 	});
 });
 
