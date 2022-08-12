@@ -81,6 +81,9 @@ passport.serializeUser((user, cb) => {
 	});
 });
 
+// user parameter is the returned user from serializeUser. 
+// Will attach the returned value to req.user in requests
+// This configuration means that the req.user object will have the same values as session cookies
 passport.deserializeUser((user, cb) => {
 	process.nextTick(() => cb(null, user));
 });
