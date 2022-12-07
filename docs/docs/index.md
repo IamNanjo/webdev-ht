@@ -2,7 +2,7 @@
 
 Ensimmäinen versio: 11.8.2022
 
-Viimeksi päivitetty: 12.8.2022
+Viimeksi päivitetty: 7.12.2022 (itsearvio päivitetty tälle kurssille sopivaksi)
 
 ## Yleiskatsaus
 
@@ -71,7 +71,7 @@ Näiden lisäksi on myös muutama API reitti, joissa ei ole näkymää:
 
 Olen erittäin tyytyväinen harjoitustyön ohjelmaan ja siitä tuli melko pitkälti sellainen kuin halusin, vaikka käyttöliittymään olisi voinut vielä tehdä pientä hienosäätöä.
 
-Harjoitustyö on laaja, se toimii hyvin ja käyttöliittymä on helppokäyttöinen, mutta dokumentaatio voisi olla parempi enkä aio esitellä harjoitustyötä, joten ehdotan arvosanaa 4.
+Harjoitustyö on melko laaja, se toimii hyvin ja käyttöliittymä on helppokäyttöinen, joten ehdotan arvosanan korotusta kahdella (2 / 2).
 
 Ajan käyttö:
 
