@@ -106,18 +106,23 @@ function ChatView() {
 			// Choose the correct chat from the list whenever a new chat is selected or the chatList is updated
 			// Only update messages array if the current one is empty or it's different from the current one
 			const chat = chatList.filter((chat) => chat._id == selectedChat)[0];
-			if (
-				!messages.length ||
-				messages.slice(-1)[0]._id != chat.messages.slice(-1)[0]._id
-			) {
-				setMessages(chat.messages);
+
+			if (chat.messages.length) {
+				if (
+					!messages.length ||
+					messages.slice(-1)[0]._id != chat.messages.slice(-1)[0]._id
+				) {
+					setMessages(chat.messages);
+				}
+			} else {
+				setMessages([]);
 			}
 		}
 	}, [selectedChat, chatList]);
 
 	useEffect(() => {
 		// Scroll to bottom whenever there's a new message or when messages are first loaded
-		messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+		messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
 	}, [messages]);
 
 	// Create a new chat with the selected users
@@ -174,13 +179,11 @@ function ChatView() {
 		if (selectedChat == id) return;
 
 		// Deselect currently active chat
-		Array.from(document.getElementById("chatList").children).forEach(
-			(el) => {
-				if (el.classList.contains("active")) {
-					el.classList.remove("active");
-				}
+		Array.from(document.getElementById("chatList").children).forEach((el) => {
+			if (el.classList.contains("active")) {
+				el.classList.remove("active");
 			}
-		);
+		});
 
 		// Select new chat (Loads messages into the view)
 		setSelectedChat(id);
@@ -240,10 +243,7 @@ function ChatView() {
 					tabindex="-1"
 					role="dialog"
 				>
-					<div
-						className="modal-dialog modal-dialog-centered"
-						role="document"
-					>
+					<div className="modal-dialog modal-dialog-centered" role="document">
 						<div className="modal-content border border-secondary">
 							<div className="modal-header">
 								<h5 className="modal-title noselect">
@@ -299,9 +299,7 @@ function ChatView() {
 					>
 						<div className="modal-content border border-secondary">
 							<div className="modal-header">
-								<h5 className="modal-title noselect">
-									Select users
-								</h5>
+								<h5 className="modal-title noselect">Select users</h5>
 								<span
 									className="material-symbols-rounded"
 									aria-label="Close"
@@ -329,15 +327,11 @@ function ChatView() {
 										users.map((user) => (
 											<li
 												className={`noselect list-group-item ${
-													selectedUsers.includes(
-														user._id
-													)
+													selectedUsers.includes(user._id)
 														? "list-group-item-success"
 														: null
 												}`}
-												onClick={(e) =>
-													toggleUser(e, user._id)
-												}
+												onClick={(e) => toggleUser(e, user._id)}
 											>
 												{user.username}
 											</li>
@@ -384,22 +378,18 @@ function ChatView() {
 					{chatList.length > 0 &&
 						chatList.map((chat) => {
 							let members = "";
-							if (chat.members.length <= 1)
-								members = "Empty chat";
+							if (chat.members.length <= 1) members = "Empty chat";
 							else {
 								for (let i = 0; i < chat.members.length; i++) {
-									if (chat.members[i]._id == loggedInUser)
-										members += "You";
+									if (chat.members[i]._id == loggedInUser) members += "You";
 									else members += chat.members[i].username;
 
-									if (i != chat.members.length - 1)
-										members += ", ";
+									if (i != chat.members.length - 1) members += ", ";
 								}
 							}
 							let lastMessage = "";
 							if (chat.messages.length > 0) {
-								lastMessage =
-									chat.messages.slice(-1)[0].content;
+								lastMessage = chat.messages.slice(-1)[0].content;
 							}
 							return (
 								<li
@@ -410,9 +400,7 @@ function ChatView() {
 									<h2>
 										<span
 											className={`material-symbols-rounded align-middle pr-2 ${
-												selectedChat == chat._id
-													? null
-													: "text-danger"
+												selectedChat == chat._id ? null : "text-danger"
 											}`}
 											onClick={(e) => {
 												e.stopPropagation();
@@ -421,14 +409,10 @@ function ChatView() {
 										>
 											delete
 										</span>
-										{!chat.members.length
-											? "Empty chat"
-											: members}
+										{!chat.members.length ? "Empty chat" : members}
 									</h2>
 									{lastMessage != "" && (
-										<div style={{ paddingLeft: "33px" }}>
-											{lastMessage}
-										</div>
+										<div style={{ paddingLeft: "33px" }}>{lastMessage}</div>
 									)}
 								</li>
 							);
@@ -446,8 +430,7 @@ function ChatView() {
 							const createdOn = (
 								<div
 									className={`${
-										msg.sender == null ||
-										msg.sender._id != loggedInUser
+										msg.sender == null || msg.sender._id != loggedInUser
 											? "text-muted"
 											: "text-dark"
 									} text-right w-100 mt-2`}
@@ -455,10 +438,7 @@ function ChatView() {
 							);
 							if (msg.sender == null) {
 								return (
-									<li
-										key={msg._id}
-										className="message rounded border"
-									>
+									<li key={msg._id} className="message rounded border">
 										<h2>Deleted user</h2>
 										<div>{msg.content}</div>
 										{createdOn}
@@ -476,10 +456,7 @@ function ChatView() {
 								);
 							} else {
 								return (
-									<li
-										key={msg._id}
-										className="message rounded border"
-									>
+									<li key={msg._id} className="message rounded border">
 										<h2>{msg.sender.username}</h2>
 										<div>{msg.content}</div>
 										{createdOn}
@@ -489,11 +466,7 @@ function ChatView() {
 						})}
 					<div ref={messagesEndRef} />
 				</ul>
-				<form
-					id="messageForm"
-					className="form-inline"
-					onSubmit={sendMessage}
-				>
+				<form id="messageForm" className="form-inline" onSubmit={sendMessage}>
 					<textarea
 						id="messageField"
 						className="form-control"
