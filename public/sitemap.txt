@@ -1,0 +1,4 @@
+https://webdev-ht.nanjo.tech
+https://webdev-ht.nanjo.tech/auth/login
+https://webdev-ht.nanjo.tech/auth/register
+https://webdev-ht.nanjo.tech/messages

@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://webdev-ht.nanjo.tech/sitemap.txt
